@@ -8,3 +8,6 @@ library immutable;
 
 // TODO: Export any libraries intended for clients of this package.
 
+import 'dart:collection';
+
+part 'src/immutable_stack.dart';
