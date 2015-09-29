@@ -8,4 +8,3 @@ library immutable;
 
 // TODO: Export any libraries intended for clients of this package.
 
-export 'src/immutable_base.dart';
