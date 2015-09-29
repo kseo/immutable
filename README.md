@@ -1,6 +1,6 @@
 # immutable
 
-A library for Dart developers. It is awesome.
+Immutable collections for Dart.
 
 ## Usage
 
@@ -9,11 +9,12 @@ A simple usage example:
     import 'package:immutable/immutable.dart';
 
     main() {
-      var awesome = new Awesome();
+      var stack = ImmutableStack.empty.push(5);
+      print(stack.peek());
     }
 
 ## Features and bugs
 
 Please file feature requests and bugs at the [issue tracker][tracker].
 
-[tracker]: http://example.com/issues/replaceme
+[tracker]: https://github.com/kseo/immutable/issues
