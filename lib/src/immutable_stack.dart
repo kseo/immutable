@@ -79,6 +79,16 @@ class _ImmutableStack<E> extends IterableBase<E> implements ImmutableStack<E> {
   }
 
   Iterator<E> get iterator => new _ImmutableStackIterator(this);
+
+  /// Reverses the order of a stack.
+  ImmutableStack<E> _reverse() {
+    var r = clear();
+    for (ImmutableStack<E> f = this; f.isNotEmpty; f = f.pop()) {
+      r = r.push(f.peek());
+    }
+
+    return r;
+  }
 }
 
 /// Enumerates a stack with no memory allocations.

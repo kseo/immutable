@@ -10,4 +10,5 @@ library immutable;
 
 import 'dart:collection';
 
+part 'src/immutable_queue.dart';
 part 'src/immutable_stack.dart';
