@@ -2,7 +2,7 @@ part of immutable;
 
 abstract class ImmutableQueue<E> implements Iterable<E> {
   /// Returns an empty collection.
-  static ImmutableQueue empty = _ImmutableQueue.empty;
+  static final ImmutableQueue empty = _ImmutableQueue.empty;
 
   ///  Creates a new immutable collection prefilled with the specified [items].
   factory ImmutableQueue.from(Iterable<E> items) {
@@ -36,7 +36,7 @@ abstract class ImmutableQueue<E> implements Iterable<E> {
 }
 
 class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
-  static _ImmutableQueue empty =
+  static final _ImmutableQueue empty =
       new _ImmutableQueue(_ImmutableStack.empty, _ImmutableStack.empty);
 
   /// The end of the queue that enqueued elements are pushed onto.

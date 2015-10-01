@@ -2,7 +2,7 @@ part of immutable;
 
 abstract class ImmutableStack<E> implements Iterable<E> {
   /// Returns an empty collection.
-  static ImmutableStack empty = _ImmutableStack.empty;
+  static final ImmutableStack empty = _ImmutableStack.empty;
 
   ///  Creates a new immutable collection prefilled with the specified [items].
   factory ImmutableStack.from(Iterable<E> items) {
@@ -36,7 +36,7 @@ abstract class ImmutableStack<E> implements Iterable<E> {
 }
 
 class _ImmutableStack<E> extends IterableBase<E> implements ImmutableStack<E> {
-  static _ImmutableStack empty = new _ImmutableStack._();
+  static final _ImmutableStack empty = new _ImmutableStack._();
 
   final E _head;
   final ImmutableStack<E> _tail;
