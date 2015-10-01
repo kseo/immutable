@@ -10,6 +10,10 @@ library immutable;
 // TODO: Export any libraries intended for clients of this package.
 
 import 'dart:collection';
+import 'dart:math';
 
+import 'src/internal.dart';
+
+part 'src/immutable_list.dart';
 part 'src/immutable_queue.dart';
 part 'src/immutable_stack.dart';
