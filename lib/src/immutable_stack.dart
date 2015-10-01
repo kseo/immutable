@@ -41,7 +41,7 @@ class _ImmutableStack<E> extends IterableBase<E> implements ImmutableStack<E> {
   final E _head;
   final ImmutableStack<E> _tail;
 
-  _ImmutableStack._();
+  _ImmutableStack._(): _head = null, _tail = null;
 
   _ImmutableStack._from(E head, _ImmutableStack<E> tail)
       : _head = head,
