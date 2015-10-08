@@ -46,9 +46,7 @@ class _ImmutableStack<E> extends IterableBase<E> implements ImmutableStack<E> {
   _ImmutableStack._from(E head, _ImmutableStack<E> tail)
       : _head = head,
         _tail = tail {
-    if (tail == null) {
-      throw new ArgumentError.notNull('tail');
-    }
+    if (tail == null) throw new ArgumentError.notNull('tail');
   }
 
   @override
@@ -59,9 +57,7 @@ class _ImmutableStack<E> extends IterableBase<E> implements ImmutableStack<E> {
 
   @override
   E peek() {
-    if (isEmpty) {
-      throw new StateError('stack is empty');
-    }
+    if (isEmpty) throw new StateError('stack is empty');
 
     return _head;
   }
@@ -71,9 +67,7 @@ class _ImmutableStack<E> extends IterableBase<E> implements ImmutableStack<E> {
 
   @override
   _ImmutableStack<E> pop() {
-    if (isEmpty) {
-      throw new StateError('stack is empty');
-    }
+    if (isEmpty) throw new StateError('stack is empty');
 
     return _tail;
   }
@@ -100,9 +94,7 @@ class _ImmutableStackIterator<E> implements Iterator<E> {
   _ImmutableStack<E> _remainingStack;
 
   _ImmutableStackIterator(_ImmutableStack<E> stack) : _originalStack = stack {
-    if (stack == null) {
-      throw new ArgumentError.notNull('stack');
-    }
+    if (stack == null) throw new ArgumentError.notNull('stack');
   }
 
   @override

@@ -6,9 +6,7 @@ abstract class ImmutableQueue<E> implements Iterable<E> {
 
   ///  Creates a new immutable collection prefilled with the specified [items].
   factory ImmutableQueue.from(Iterable<E> items) {
-    if (items == null) {
-      throw new ArgumentError.notNull('items');
-    }
+    if (items == null) throw new ArgumentError.notNull('items');
 
     var queue = _ImmutableQueue.empty;
     for (final item in items) {
@@ -52,12 +50,8 @@ class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
       : _forwards = forwards,
         _backwards = backwards,
         _backwardsReversed = null {
-    if (forwards == null) {
-      throw new ArgumentError.notNull('forwards');
-    }
-    if (backwards == null) {
-      throw new ArgumentError.notNull('backwards');
-    }
+    if (forwards == null) throw new ArgumentError.notNull('forwards');
+    if (backwards == null) throw new ArgumentError.notNull('backwards');
   }
 
   /// Gets the empty queue.
@@ -67,18 +61,14 @@ class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
   bool get isEmpty => _forwards.isEmpty && _backwards.isEmpty;
 
   _ImmutableStack<E> get backwardsReversed {
-    if (_backwardsReversed == null) {
-      _backwardsReversed = _backwards._reverse();
-    }
+    if (_backwardsReversed == null) _backwardsReversed = _backwards._reverse();
 
     return _backwardsReversed;
   }
 
   @override
   E peek() {
-    if (isEmpty) {
-      throw new StateError('queue empty');
-    }
+    if (isEmpty) throw new StateError('queue empty');
 
     return _forwards.peek();
   }
@@ -95,9 +85,7 @@ class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
 
   @override
   ImmutableQueue<E> dequeue() {
-    if (isEmpty) {
-      throw new StateError('queue empty');
-    }
+    if (isEmpty) throw new StateError('queue empty');
 
     _ImmutableStack<E> f = _forwards.pop();
     if (f.isNotEmpty) {
@@ -127,9 +115,7 @@ class _ImmutableQueueIterator<E> implements Iterator<E> {
 
   @override
   E get current {
-    if (_remainingForwardsStack == null) {
-      return null;
-    }
+    if (_remainingForwardsStack == null) return null;
 
     if (_remainingForwardsStack.isNotEmpty) {
       return _remainingForwardsStack.peek();
