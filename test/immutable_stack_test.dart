@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 void main() {
   group('ImmutableStackTest', () {
     ImmutableStack<int> initStackHelper(Iterable<int> values) {
-      var result = ImmutableStack.empty;
+      var result = new ImmutableStack<int>.empty();
       for (final value in values) {
         result = result.push(value);
       }
@@ -15,15 +15,15 @@ void main() {
     }
 
     test('empty test', () {
-      ImmutableStack<int> actual = ImmutableStack.empty;
+      ImmutableStack<int> actual = new ImmutableStack<int>.empty();
       expect(actual, isNotNull);
       expect(actual.isEmpty, isTrue);
-      expect(ImmutableStack.empty, same(actual.clear()));
-      expect(ImmutableStack.empty, same(actual.push(1).clear()));
+      expect(new ImmutableStack<int>.empty(), same(actual.clear()));
+      expect(new ImmutableStack<int>.empty(), same(actual.push(1).clear()));
     });
 
     test('push and length', () {
-      final actual0 = ImmutableStack.empty;
+      final actual0 = new ImmutableStack<int>.empty();
       expect(actual0.length, equals(0));
       final actual1 = actual0.push(1);
       expect(actual1.length, equals(1));
@@ -81,7 +81,7 @@ void main() {
       iteratorTestHelper([1, 2, 3]);
       iteratorTestHelper([]);
 
-      final stack = ImmutableStack.empty.push(5);
+      final stack = new ImmutableStack<int>.empty().push(5);
       final iterator = stack.iterator;
       expect(iterator.current, isNull);
       expect(iterator.moveNext(), isTrue);
@@ -91,25 +91,26 @@ void main() {
     });
 
     test('equality', () {
-      expect(ImmutableStack.empty, isNotNull);
-      expect(ImmutableStack.empty, isNot(equals('hi')));
-      expect(ImmutableStack.empty, equals(ImmutableStack.empty));
-      expect(
-          ImmutableStack.empty.push(3), equals(ImmutableStack.empty.push(3)));
-      expect(ImmutableStack.empty.push(5),
-          isNot(equals(ImmutableStack.empty.push(3))));
-      expect(ImmutableStack.empty.push(3).push(5),
-          isNot(equals(ImmutableStack.empty.push(3))));
-      expect(ImmutableStack.empty.push(3),
-          isNot(equals(ImmutableStack.empty.push(3).push(5))));
+      expect(new ImmutableStack<int>.empty(), isNotNull);
+      expect(new ImmutableStack<int>.empty(), isNot(equals('hi')));
+      expect(new ImmutableStack<int>.empty(),
+          equals(new ImmutableStack<int>.empty()));
+      expect(new ImmutableStack<int>.empty().push(3),
+          equals(new ImmutableStack<int>.empty().push(3)));
+      expect(new ImmutableStack<int>.empty().push(5),
+          isNot(equals(new ImmutableStack<int>.empty().push(3))));
+      expect(new ImmutableStack<int>.empty().push(3).push(5),
+          isNot(equals(new ImmutableStack<int>.empty().push(3))));
+      expect(new ImmutableStack<int>.empty().push(3),
+          isNot(equals(new ImmutableStack<int>.empty().push(3).push(5))));
     });
 
     test('empty peek throws', () {
-      expect(() => ImmutableStack.empty.peek(), throwsStateError);
+      expect(() => new ImmutableStack<int>.empty().peek(), throwsStateError);
     });
 
     test('empty pop throws', () {
-      expect(() => ImmutableStack.empty.pop(), throwsStateError);
+      expect(() => new ImmutableStack<int>.empty().pop(), throwsStateError);
     });
 
     test('create', () {

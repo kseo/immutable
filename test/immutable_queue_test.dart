@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 void main() {
   group('ImmutableQueueTest', () {
     test('iteration order', () {
-      var queue = ImmutableQueue.empty;
+      var queue = new ImmutableQueue<int>.empty();
 
       // Push elements onto the backwards stack.
       queue = queue.enqueue(1).enqueue(2).enqueue(3);
@@ -31,7 +31,7 @@ void main() {
     });
 
     test('iterator', () {
-      final queue = ImmutableQueue.empty.enqueue(5);
+      final queue = new ImmutableQueue<int>.empty().enqueue(5);
       final iterator = queue.iterator;
       expect(iterator.current, isNull);
       expect(iterator.moveNext(), isTrue);
@@ -42,7 +42,7 @@ void main() {
 
     test('enqueue/dequeue', () {
       final items = [1, 2, 3];
-      var queue = ImmutableQueue.empty;
+      var queue = new ImmutableQueue<int>.empty();
       int i = 0;
       for (final item in items) {
         final nextQueue = queue.enqueue(item);
@@ -70,35 +70,41 @@ void main() {
     });
 
     test('clear', () {
-      final emptyQueue = ImmutableQueue.empty;
+      final emptyQueue = new ImmutableQueue<int>.empty();
       expect(emptyQueue.clear(), same(emptyQueue));
       final nonEmptyQueue = emptyQueue.enqueue(3);
       expect(nonEmptyQueue.clear(), same(emptyQueue));
     });
 
     test('equality', () {
-      expect(ImmutableQueue.empty, isNotNull);
-      expect(ImmutableQueue.empty, isNot(equals('hi')));
-      expect(ImmutableQueue.empty, equals(ImmutableQueue.empty));
-      expect(ImmutableQueue.empty.enqueue(3),
-          equals(ImmutableQueue.empty.enqueue(3)));
-      expect(ImmutableQueue.empty.enqueue(5),
-          isNot(equals(ImmutableQueue.empty.enqueue(3))));
-      expect(ImmutableQueue.empty.enqueue(3).enqueue(5),
-          isNot(equals(ImmutableQueue.empty.enqueue(3))));
-      expect(ImmutableQueue.empty.enqueue(3),
-          isNot(equals(ImmutableQueue.empty.enqueue(3).enqueue(5))));
+      expect(new ImmutableQueue<int>.empty(), isNotNull);
+      expect(new ImmutableQueue<int>.empty(), isNot(equals('hi')));
+      expect(new ImmutableQueue<int>.empty(),
+          equals(new ImmutableQueue<int>.empty()));
+      expect(new ImmutableQueue<int>.empty().enqueue(3),
+          equals(new ImmutableQueue<int>.empty().enqueue(3)));
+      expect(new ImmutableQueue<int>.empty().enqueue(5),
+          isNot(equals(new ImmutableQueue<int>.empty().enqueue(3))));
+      expect(new ImmutableQueue<int>.empty().enqueue(3).enqueue(5),
+          isNot(equals(new ImmutableQueue<int>.empty().enqueue(3))));
+      expect(new ImmutableQueue<int>.empty().enqueue(3),
+          isNot(equals(new ImmutableQueue<int>.empty().enqueue(3).enqueue(5))));
 
-      expect(ImmutableQueue.empty.enqueue(3).enqueue(1).enqueue(2).dequeue(),
-          equals(ImmutableQueue.empty.enqueue(1).enqueue(2)));
+      expect(
+          new ImmutableQueue<int>.empty()
+              .enqueue(3)
+              .enqueue(1)
+              .enqueue(2)
+              .dequeue(),
+          equals(new ImmutableQueue<int>.empty().enqueue(1).enqueue(2)));
     });
 
     test('empty peek throws', () {
-      expect(() => ImmutableQueue.empty.peek(), throwsStateError);
+      expect(() => new ImmutableQueue<int>.empty().peek(), throwsStateError);
     });
 
     test('empty dequeue throws', () {
-      expect(() => ImmutableQueue.empty.dequeue(), throwsStateError);
+      expect(() => new ImmutableQueue<int>.empty().dequeue(), throwsStateError);
     });
 
     test('create', () {

@@ -2,7 +2,7 @@ part of immutable;
 
 abstract class ImmutableStack<E> implements Iterable<E> {
   /// Returns an empty collection.
-  static final ImmutableStack empty = _ImmutableStack.empty;
+  factory ImmutableStack.empty() => new _ImmutableStack<E>.empty();
 
   ///  Creates a new immutable collection prefilled with the specified [items].
   factory ImmutableStack.from(Iterable<E> items) {
@@ -10,7 +10,7 @@ abstract class ImmutableStack<E> implements Iterable<E> {
       throw new ArgumentError.notNull('items');
     }
 
-    var stack = _ImmutableStack.empty;
+    var stack = _ImmutableStack._empty;
     for (final item in items) {
       stack = stack.push(item);
     }
@@ -36,21 +36,23 @@ abstract class ImmutableStack<E> implements Iterable<E> {
 }
 
 class _ImmutableStack<E> extends IterableBase<E> implements ImmutableStack<E> {
-  static final _ImmutableStack empty = new _ImmutableStack._();
+  static final _ImmutableStack _empty = new _ImmutableStack();
 
   final E _head;
   final ImmutableStack<E> _tail;
 
-  _ImmutableStack._(): _head = null, _tail = null;
+  factory _ImmutableStack.empty() => _empty;
 
-  _ImmutableStack._from(E head, _ImmutableStack<E> tail)
+  _ImmutableStack(): _head = null, _tail = null;
+
+  _ImmutableStack.from(E head, _ImmutableStack<E> tail)
       : _head = head,
         _tail = tail {
     if (tail == null) throw new ArgumentError.notNull('tail');
   }
 
   @override
-  _ImmutableStack<E> clear() => empty;
+  _ImmutableStack<E> clear() => _empty;
 
   @override
   bool get isEmpty => _tail == null;
@@ -63,7 +65,7 @@ class _ImmutableStack<E> extends IterableBase<E> implements ImmutableStack<E> {
   }
 
   @override
-  _ImmutableStack<E> push(E value) => new _ImmutableStack._from(value, this);
+  _ImmutableStack<E> push(E value) => new _ImmutableStack.from(value, this);
 
   @override
   _ImmutableStack<E> pop() {
