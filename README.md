@@ -1,6 +1,7 @@
 # immutable
 
-Immutable collections for Dart.
+Immutable collections for Dart. It's in its very early days and under heavy development,
+not ready for production use.
 
 ## Usage
 
