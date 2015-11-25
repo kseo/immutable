@@ -3,11 +3,7 @@
 // license that can be found in the LICENSE file.
 
 /// The immutable library.
-///
-/// This is an awesome library. More dartdocs go here.
 library immutable;
-
-// TODO: Export any libraries intended for clients of this package.
 
 import 'dart:collection';
 import 'dart:math';
