@@ -1,7 +1,7 @@
 library immutable.test.immutable_list;
 
 import 'package:immutable/immutable.dart';
-import "package:range/range.dart";
+import 'package:quiver_iterables/iterables.dart' show range;
 import 'package:test/test.dart';
 
 void main() {
