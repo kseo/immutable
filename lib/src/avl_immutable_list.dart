@@ -26,7 +26,7 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
   factory _AvlImmutableList.empty() => _empty;
 
   _AvlImmutableList.fromNode(this._root) {
-    if (_root == null) throw new ArgumentError.notNull('root');
+    checkNotNull(_root);
 
     _root.freeze();
   }
@@ -73,7 +73,7 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
 
   @override
   ImmutableList<E> addAll(Iterable<E> iterable) {
-    if (iterable == null) throw new ArgumentError.notNull('iterable');
+    checkNotNull(iterable);
     if (this.isEmpty) return _fillFromEmpty(iterable);
 
     final result = _root.addAll(iterable);
@@ -117,7 +117,7 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
   @override
   ImmutableList<E> insertAll(int index, Iterable<E> iterable) {
     RangeError.checkValueInInterval(index, 0, length, "index");
-    if (iterable == null) throw new ArgumentError.notNull('iterable');
+    checkNotNull(iterable);
 
     final result = _root.insertAll(index, iterable);
     return _wrap(result);
@@ -169,7 +169,7 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
 
   @override
   ImmutableList<E> removeWhere(bool test(E element)) {
-    if (test == null) throw new ArgumentError.notNull('test');
+    checkNotNull(test);
 
     return _wrap(_root.removeWhere(test));
   }
@@ -197,7 +197,7 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
 
   @override
   ImmutableList<E> retainWhere(bool test(E element)) {
-    if (test == null) throw new ArgumentError.notNull('test');
+    checkNotNull(test);
 
     return removeWhere((E element) => !test(element));
   }
@@ -328,7 +328,7 @@ class _AvlImmutableListBuilder<E> extends ListBase<E>
   int _version = 0;
 
   _AvlImmutableListBuilder(_AvlImmutableList<E> list) {
-    if (list == null) throw new ArgumentError.notNull('list');
+    checkNotNull(list);
     _root = list._root;
     _immutable = list;
   }
@@ -380,7 +380,7 @@ class _AvlImmutableListBuilder<E> extends ListBase<E>
 
   @override
   void addAll(Iterable<E> iterable) {
-    if (iterable == null) throw new ArgumentError.notNull('iterable');
+    checkNotNull(iterable);
     _root = _root.addAll(iterable);
   }
 
@@ -411,7 +411,7 @@ class _AvlImmutableListBuilder<E> extends ListBase<E>
   @override
   void insertAll(int index, Iterable<E> iterable) {
     RangeError.checkValueInInterval(index, 0, length, "index");
-    if (iterable == null) throw new ArgumentError.notNull('iterable');
+    checkNotNull(iterable);
 
     _root = _root.insertAll(index, iterable);
   }
@@ -460,14 +460,14 @@ class _AvlImmutableListBuilder<E> extends ListBase<E>
 
   @override
   void removeWhere(bool test(E element)) {
-    if (test == null) throw new ArgumentError.notNull('test');
+    checkNotNull(test);
 
     _root = _root.removeWhere(test);
   }
 
   @override
   void retainWhere(bool test(E element)) {
-    if (test == null) throw new ArgumentError.notNull('test');
+    checkNotNull(test);
 
     removeWhere((E element) => !test(element));
   }
@@ -528,7 +528,7 @@ class _ImmutableListIterator<E> implements Iterator<E> {
         _startIndex =
             startIndex >= 0 ? startIndex : (reversed ? root.length - 1 : 0),
         _count = count == -1 ? root.length : count {
-    if (_root == null) throw new ArgumentError.notNull('root');
+    checkNotNull(_root);
     if (startIndex < -1) {
       throw new ArgumentError('startIndex must be greater than or equal to -1');
     }
@@ -580,7 +580,7 @@ class _ImmutableListIterator<E> implements Iterator<E> {
   _AvlNode _previousBranch(_AvlNode node) => _reversed ? node.right : node.left;
 
   void _pushNext(_AvlNode node) {
-    if (node == null) throw new ArgumentError.notNull('node');
+    checkNotNull(node);
 
     while (node.isNotEmpty) {
       _stack.push(node);
@@ -651,8 +651,8 @@ class _AvlNode<E> extends IterableBase<E>
 
   _AvlNode.from(this._key, this._left, this._right, {bool frozen: false})
       : _frozen = frozen {
-    if (_left == null) throw new ArgumentError.notNull('left');
-    if (_right == null) throw new ArgumentError.notNull('right');
+    checkNotNull(_left);
+    checkNotNull(_right);
 
     _height = 1 + max(_left._height, _right._height);
     _length = 1 + _left._length + _right._length;
@@ -746,7 +746,7 @@ class _AvlNode<E> extends IterableBase<E>
   /// Adds a collection of values at a given index to this node.
   _AvlNode insertAll(int index, Iterable<E> keys) {
     RangeError.checkValueInInterval(index, 0, _length, "index");
-    if (keys == null) throw new ArgumentError.notNull('keys');
+    checkNotNull(keys);
 
     if (isEmpty) {
       _AvlImmutableList<E> other = _tryCastToImmutableList(keys);
@@ -825,7 +825,7 @@ class _AvlNode<E> extends IterableBase<E>
   }
 
   _AvlNode removeWhere(bool test(E element)) {
-    if (test == null) throw new ArgumentError.notNull('test');
+    checkNotNull(test);
 
     var result = this;
     int index = 0;
@@ -887,7 +887,7 @@ class _AvlNode<E> extends IterableBase<E>
 
   /// Creates a node tree that contains the contents of a list.
   static _AvlNode nodeTreeFromList(List items, int start, int length) {
-    if (items == null) throw new ArgumentError.notNull('items');
+    checkNotNull(items);
     RangeError.checkNotNegative(start, 'start');
     RangeError.checkNotNegative(length, 'length');
     if (length == 0) return emptyNode;
@@ -901,7 +901,7 @@ class _AvlNode<E> extends IterableBase<E>
   }
 
   static int _balance(_AvlNode tree) {
-    if (tree == null) throw new ArgumentError.notNull('tree');
+    checkNotNull(tree);
 
     return tree._right._height - tree._left.height;
   }
@@ -926,7 +926,7 @@ class _AvlNode<E> extends IterableBase<E>
 
   /// AVL rotate double-left operation.
   static _AvlNode _doubleLeft(_AvlNode tree) {
-    if (tree == null) throw new ArgumentError.notNull('tree');
+    checkNotNull(tree);
     if (tree._right.isEmpty) return tree;
 
     final rotatedRightChild = tree._mutate(right: _rotateRight(tree._right));
@@ -935,7 +935,7 @@ class _AvlNode<E> extends IterableBase<E>
 
   /// AVL rotate double-right operation.
   static _AvlNode _doubleRight(_AvlNode tree) {
-    if (tree == null) throw new ArgumentError.notNull('tree');
+    checkNotNull(tree);
     if (tree._left.isEmpty) return tree;
 
     final rotatedLeftChild = tree._mutate(left: _rotateLeft(tree._left));
@@ -943,20 +943,20 @@ class _AvlNode<E> extends IterableBase<E>
   }
 
   static bool _isLeftHeavy(_AvlNode tree) {
-    if (tree == null) throw new ArgumentError.notNull('tree');
+    checkNotNull(tree);
 
     return _balance(tree) <= -2;
   }
 
   static bool _isRightHeavy(_AvlNode tree) {
-    if (tree == null) throw new ArgumentError.notNull('tree');
+    checkNotNull(tree);
 
     return _balance(tree) >= 2;
   }
 
   /// Balances the specified tree.
   static _AvlNode _makeBalanced(_AvlNode tree) {
-    if (tree == null) throw new ArgumentError.notNull('tree');
+    checkNotNull(tree);
 
     if (_isRightHeavy(tree)) {
       return _balance(tree._right) < 0 ? _doubleLeft(tree) : _rotateLeft(tree);
@@ -971,7 +971,7 @@ class _AvlNode<E> extends IterableBase<E>
 
   /// AVL rotate left operation.
   static _AvlNode _rotateLeft(_AvlNode tree) {
-    if (tree == null) throw new ArgumentError.notNull('tree');
+    checkNotNull(tree);
     if (tree._right.isEmpty) return tree;
 
     final right = tree._right;
@@ -980,7 +980,7 @@ class _AvlNode<E> extends IterableBase<E>
 
   /// AVL rotate right operation.
   static _AvlNode _rotateRight(_AvlNode tree) {
-    if (tree == null) throw new ArgumentError.notNull('tree');
+    checkNotNull(tree);
     if (tree._left.isEmpty) return tree;
 
     final left = tree._left;

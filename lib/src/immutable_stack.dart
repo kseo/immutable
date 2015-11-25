@@ -6,9 +6,7 @@ abstract class ImmutableStack<E> implements Iterable<E> {
 
   ///  Creates a new immutable collection prefilled with the specified [items].
   factory ImmutableStack.from(Iterable<E> items) {
-    if (items == null) {
-      throw new ArgumentError.notNull('items');
-    }
+    checkNotNull(items);
 
     var stack = _ImmutableStack._empty;
     for (final item in items) {
@@ -50,7 +48,7 @@ class _ImmutableStack<E> extends IterableBase<E> implements ImmutableStack<E> {
   _ImmutableStack.from(E head, _ImmutableStack<E> tail)
       : _head = head,
         _tail = tail {
-    if (tail == null) throw new ArgumentError.notNull('tail');
+    checkNotNull(tail);
   }
 
   @override
@@ -98,7 +96,7 @@ class _ImmutableStackIterator<E> implements Iterator<E> {
   _ImmutableStack<E> _remainingStack;
 
   _ImmutableStackIterator(_ImmutableStack<E> stack) : _originalStack = stack {
-    if (stack == null) throw new ArgumentError.notNull('stack');
+    checkNotNull(stack);
   }
 
   @override

@@ -12,6 +12,8 @@ library immutable;
 import 'dart:collection';
 import 'dart:math';
 
+import 'package:quiver_check/check.dart';
+
 import 'src/internal.dart';
 
 part 'src/avl_immutable_list.dart';

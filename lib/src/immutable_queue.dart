@@ -6,7 +6,7 @@ abstract class ImmutableQueue<E> implements Iterable<E> {
 
   ///  Creates a new immutable collection prefilled with the specified [items].
   factory ImmutableQueue.from(Iterable<E> items) {
-    if (items == null) throw new ArgumentError.notNull('items');
+    checkNotNull(items);
 
     var queue = new _ImmutableQueue<E>.empty();
     for (final item in items) {
@@ -52,8 +52,8 @@ class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
       : _forwards = forwards,
         _backwards = backwards,
         _backwardsReversed = null {
-    if (forwards == null) throw new ArgumentError.notNull('forwards');
-    if (backwards == null) throw new ArgumentError.notNull('backwards');
+    checkNotNull(forwards);
+    checkNotNull(backwards);
   }
 
   /// Gets the empty queue.
