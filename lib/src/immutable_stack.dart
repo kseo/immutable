@@ -43,7 +43,9 @@ class _ImmutableStack<E> extends IterableBase<E> implements ImmutableStack<E> {
 
   factory _ImmutableStack.empty() => _empty;
 
-  _ImmutableStack(): _head = null, _tail = null;
+  _ImmutableStack()
+      : _head = null,
+        _tail = null;
 
   _ImmutableStack.from(E head, _ImmutableStack<E> tail)
       : _head = head,

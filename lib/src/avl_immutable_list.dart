@@ -298,14 +298,18 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
 
   ImmutableList<E> _wrap(_AvlNode root) {
     if (root != _root) {
-      return root.isEmpty ? this.clear() : new _AvlImmutableList<E>.fromNode(root);
+      return root.isEmpty
+          ? this.clear()
+          : new _AvlImmutableList<E>.fromNode(root);
     } else {
       return this;
     }
   }
 
   static ImmutableList _wrapNode(_AvlNode root) {
-    return root.isEmpty ? _AvlImmutableList._empty : new _AvlImmutableList.fromNode(root);
+    return root.isEmpty
+        ? _AvlImmutableList._empty
+        : new _AvlImmutableList.fromNode(root);
   }
 }
 
@@ -522,7 +526,7 @@ class _ImmutableListIterator<E> implements Iterator<E> {
       : _root = root,
         _builder = builder,
         _startIndex =
-        startIndex >= 0 ? startIndex : (reversed ? root.length - 1 : 0),
+            startIndex >= 0 ? startIndex : (reversed ? root.length - 1 : 0),
         _count = count == -1 ? root.length : count {
     if (_root == null) throw new ArgumentError.notNull('root');
     if (startIndex < -1) {
@@ -614,7 +618,8 @@ class _ImmutableListIterator<E> implements Iterator<E> {
 }
 
 /// A node in the AVL tree storing this set.
-class _AvlNode<E> extends IterableBase<E> implements BinaryTree<E>, Iterable<E> {
+class _AvlNode<E> extends IterableBase<E>
+    implements BinaryTree<E>, Iterable<E> {
   /// The default empty node.
   static _AvlNode emptyNode = new _AvlNode();
 
@@ -891,7 +896,8 @@ class _AvlNode<E> extends IterableBase<E> implements BinaryTree<E>, Iterable<E> 
     int leftLength = (length - 1) - rightLength;
     final left = nodeTreeFromList(items, start, leftLength);
     final right = nodeTreeFromList(items, start + leftLength + 1, rightLength);
-    return new _AvlNode.from(items[start + leftLength], left, right, frozen: true);
+    return new _AvlNode.from(items[start + leftLength], left, right,
+        frozen: true);
   }
 
   static int _balance(_AvlNode tree) {
@@ -907,11 +913,11 @@ class _AvlNode<E> extends IterableBase<E> implements BinaryTree<E>, Iterable<E> 
     while (_isRightHeavy(node) || _isLeftHeavy(node)) {
       if (_isRightHeavy(node)) {
         node =
-        _balance(node._right) < 0 ? _doubleLeft(node) : _rotateLeft(node);
+            _balance(node._right) < 0 ? _doubleLeft(node) : _rotateLeft(node);
         node._mutate(left: _balanceNode(node._left));
       } else {
         node =
-        _balance(node._left) > 0 ? _doubleRight(node) : _rotateRight(node);
+            _balance(node._left) > 0 ? _doubleRight(node) : _rotateRight(node);
         node._mutate(right: _balanceNode(node._right));
       }
     }
