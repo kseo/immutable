@@ -16,3 +16,4 @@ part 'src/avl_immutable_list.dart';
 part 'src/immutable_list.dart';
 part 'src/immutable_queue.dart';
 part 'src/immutable_stack.dart';
+part 'src/key_value_pair.dart';
