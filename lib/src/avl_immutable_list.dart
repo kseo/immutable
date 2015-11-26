@@ -532,7 +532,7 @@ class _AvlNode<E> extends IterableBase<E>
   int indexOf(E element, [int startIndex = 0]) =>
       _indexOf(element, startIndex: startIndex);
 
-  int _indexOf(E element, {int startIndex, EqualityComparator comparator}) {
+  int _indexOf(E element, {int startIndex: 0, EqualityComparator comparator}) {
     if (startIndex >= _length) return -1;
     if (startIndex < 0) startIndex = 0;
     comparator ??= EqualityComparator.defaultComparator;

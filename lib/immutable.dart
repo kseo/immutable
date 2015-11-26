@@ -9,11 +9,16 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:quiver_check/check.dart';
+import 'package:quiver_iterables/iterables.dart' show zip;
+import 'package:tuple/tuple.dart';
 
 import 'src/internal.dart';
 
 part 'src/avl_immutable_list.dart';
+part 'src/immutable_hash_map.dart';
 part 'src/immutable_list.dart';
+part 'src/immutable_map.dart';
 part 'src/immutable_queue.dart';
 part 'src/immutable_stack.dart';
 part 'src/key_value_pair.dart';
+part 'src/sorted_int_key_node.dart';
