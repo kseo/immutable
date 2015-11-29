@@ -41,7 +41,7 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
   bool get isEmpty => _root.isEmpty;
 
   @override
-  Iterator<E> get iterator => new _ImmutableListIterator(_root);
+  Iterator<E> get iterator => new _AvlImmutableListIterator(_root);
 
   @override
   E get last {
@@ -490,7 +490,7 @@ class _AvlImmutableListBuilder<E> extends ListBase<E>
   }
 }
 
-class _ImmutableListIterator<E> implements Iterator<E> {
+class _AvlImmutableListIterator<E> implements Iterator<E> {
   /// The builder being iterated, if applicable.
   final _AvlImmutableListBuilder _builder;
 
@@ -518,7 +518,7 @@ class _ImmutableListIterator<E> implements Iterator<E> {
   /// The version of the builder (when applicable) that is being iterated.
   int _iteratingBuilderVersion;
 
-  _ImmutableListIterator(_AvlNode root,
+  _AvlImmutableListIterator(_AvlNode root,
       {_AvlImmutableListBuilder builder,
       int startIndex: -1,
       int count: -1,
@@ -665,7 +665,7 @@ class _AvlNode<E> extends IterableBase<E>
   bool get isEmpty => _left == null;
 
   @override
-  Iterator<E> get iterator => new _ImmutableListIterator(this);
+  Iterator<E> get iterator => new _AvlImmutableListIterator(this);
 
   @override
   _AvlNode get left => _left;
@@ -714,7 +714,7 @@ class _AvlNode<E> extends IterableBase<E>
     if (startIndex < 0) startIndex = 0;
     comparator ??= defaultEqualityComparator;
 
-    final iterator = new _ImmutableListIterator(this, startIndex: startIndex);
+    final iterator = new _AvlImmutableListIterator(this, startIndex: startIndex);
     var index = startIndex;
     while (iterator.moveNext()) {
       if (comparator(element, iterator.current)) {
@@ -780,7 +780,7 @@ class _AvlNode<E> extends IterableBase<E>
       if (startIndex >= _length) startIndex = _length - 1;
     }
 
-    final iterator = new _ImmutableListIterator(this,
+    final iterator = new _AvlImmutableListIterator(this,
         startIndex: startIndex, reversed: true);
     var index = startIndex;
     while (iterator.moveNext()) {
@@ -863,7 +863,7 @@ class _AvlNode<E> extends IterableBase<E>
   }
 
   Iterator<E> _iterator(ImmutableListBuilder builder) =>
-      new _ImmutableListIterator(this, builder: builder);
+      new _AvlImmutableListIterator(this, builder: builder);
 
   /// Creates a node mutation, either by mutating this node (if not yet frozen)
   /// or by creating a clone of this node with the described changes.
@@ -999,7 +999,7 @@ class _ReversedIterable<E> extends IterableBase<E> {
 
   @override
   Iterator<E> get iterator =>
-      new _ImmutableListIterator<E>(_root, reversed: true);
+      new _AvlImmutableListIterator<E>(_root, reversed: true);
 }
 
 class _SubListIterable<E> extends IterableBase<E> {
@@ -1016,6 +1016,6 @@ class _SubListIterable<E> extends IterableBase<E> {
   }
 
   @override
-  Iterator<E> get iterator => new _ImmutableListIterator<E>(_root,
+  Iterator<E> get iterator => new _AvlImmutableListIterator<E>(_root,
       startIndex: _start, count: _end - _start);
 }
