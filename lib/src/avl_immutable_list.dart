@@ -712,12 +712,12 @@ class _AvlNode<E> extends IterableBase<E>
   int _indexOf(E element, {int startIndex, EqualityComparator comparator}) {
     if (startIndex >= _length) return -1;
     if (startIndex < 0) startIndex = 0;
-    comparator ??= defaultEqualityComparator;
+    comparator ??= EqualityComparator.defaultComparator;
 
     final iterator = new _AvlImmutableListIterator(this, startIndex: startIndex);
     var index = startIndex;
     while (iterator.moveNext()) {
-      if (comparator(element, iterator.current)) {
+      if (comparator.equals(element, iterator.current)) {
         return index;
       }
 

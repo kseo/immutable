@@ -1,8 +1,18 @@
 part of immutable._internal;
 
-/// The signature of a generic equality function.
-///
-/// [EqualityComparator] returns `true` if [a] is equal to [b].
-typedef bool EqualityComparator<T>(T a, T b);
+abstract class EqualityComparator<T> {
+  static final EqualityComparator defaultComparator =
+      new DefaultEqualityComparator();
 
-bool defaultEqualityComparator(dynamic a, dynamic b) => a == b;
+  bool equals(T x, T y);
+
+  int getHashCode(T object);
+}
+
+class DefaultEqualityComparator<T> implements EqualityComparator<T> {
+  @override
+  bool equals(T x, T y) => x == y;
+
+  @override
+  int getHashCode(T object) => object.hashCode;
+}
