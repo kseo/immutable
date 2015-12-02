@@ -271,7 +271,7 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
       new _SubListIterable<E>(_root, 0, min(count, this.length));
 
   @override
-  ImmutableListBuilder toBuilder() => new _AvlImmutableListBuilder(this);
+  ImmutableListBuilder<E> toBuilder() => new _AvlImmutableListBuilder(this);
 
   /// Creates an immutable list with the contents from a sequence of elements.
   ImmutableList<E> _fillFromEmpty(Iterable<E> iterable) {
