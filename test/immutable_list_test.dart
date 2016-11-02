@@ -27,8 +27,8 @@ void main() {
         expect(list[i - 1], equals(i * 10));
       }
 
-      var bulkList =
-          new ImmutableList<int>.empty().addAll(range(1, 11).map((i) => i * 10));
+      var bulkList = new ImmutableList<int>.empty()
+          .addAll((range(1, 11) as Iterable<int>).map((i) => i * 10));
       expect(bulkList, equals(list));
     });
 
@@ -135,7 +135,7 @@ void main() {
         "Laptops"
       ];
 
-      var list = new ImmutableList<int>.empty();
+      var list = new ImmutableList<String>.empty();
       for (String newElement in expectedList) {
         expect(list.contains(newElement), isFalse);
         list = list.add(newElement);

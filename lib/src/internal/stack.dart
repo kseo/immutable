@@ -26,7 +26,7 @@ class Stack<E> extends IterableBase<E> {
   }
 
   @override
-  Iterator get iterator => _items.reversed.iterator;
+  Iterator<E> get iterator => _items.reversed.iterator;
 
   /// Returns the number of elements in the [Stack].
   @override

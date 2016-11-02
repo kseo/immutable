@@ -19,11 +19,11 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
   static final _AvlImmutableList _empty = new _AvlImmutableList();
 
   /// The root node of the AVL tree that stores this set.
-  final _AvlNode _root;
+  final _AvlNode<E> _root;
 
-  _AvlImmutableList() : _root = _AvlNode.emptyNode;
+  _AvlImmutableList() : _root = _AvlNode.emptyNode as _AvlNode<E>;
 
-  factory _AvlImmutableList.empty() => _empty;
+  factory _AvlImmutableList.empty() => _empty as _AvlImmutableList<E>;
 
   _AvlImmutableList.fromNode(this._root) {
     checkNotNull(_root);
@@ -81,10 +81,10 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
   }
 
   @override
-  ImmutableList<E> clear() => _empty;
+  ImmutableList<E> clear() => _empty as ImmutableList<E>;
 
   @override
-  bool contains(Object element) => indexOf(element) >= 0;
+  bool contains(Object element) => indexOf(element as E) >= 0;
 
   @override
   E elementAt(int index) => _root[index];
@@ -137,7 +137,7 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
 
   @override
   ImmutableList<E> remove(Object value) {
-    int index = indexOf(value);
+    int index = indexOf(value as E);
     return index < 0 ? this : removeAt(index);
   }
 
@@ -227,7 +227,7 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
     if (length == 0) return this;
     RangeError.checkNotNegative(skipCount, "skipCount");
 
-    List otherList;
+    List<E> otherList;
     int otherStart;
     if (iterable is List) {
       otherList = iterable;
@@ -263,7 +263,8 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
     if (end == null) end = listLength;
     RangeError.checkValidRange(start, end, listLength);
 
-    return _wrap(_AvlNode.nodeTreeFromList(this.toList(), start, end - start));
+    return _wrap(_AvlNode.nodeTreeFromList(this.toList(), start, end - start)
+        as _AvlNode<E>);
   }
 
   @override
@@ -279,7 +280,8 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
 
     // If the items being added actually come from an ImmutableList<E>
     // then there is no value in reconstructing it.
-    _AvlImmutableList<E> other = _tryCastToImmutableList(iterable);
+    _AvlImmutableList<E> other =
+        _tryCastToImmutableList(iterable) as _AvlImmutableList<E>;
     if (other != null) return other;
 
     // Rather than build up the immutable structure in the incremental way,
@@ -292,11 +294,12 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
     final list = iterable.toList();
     if (list.length == 0) return this;
 
-    _AvlNode root = _AvlNode.nodeTreeFromList(list, 0, list.length);
+    _AvlNode<E> root =
+        _AvlNode.nodeTreeFromList(list, 0, list.length) as _AvlNode<E>;
     return new _AvlImmutableList<E>.fromNode(root);
   }
 
-  ImmutableList<E> _wrap(_AvlNode root) {
+  ImmutableList<E> _wrap(_AvlNode<E> root) {
     if (root != _root) {
       return root.isEmpty
           ? this.clear()
@@ -330,18 +333,18 @@ class _AvlImmutableListIterator<E> implements Iterator<E> {
   bool _reversed;
 
   /// The set being iterated.
-  _AvlNode _root;
+  _AvlNode<E> _root;
 
   /// The stack to use for iterating the binary tree.
-  Stack<_AvlNode> _stack;
+  Stack<_AvlNode<E>> _stack;
 
   /// The node currently selected.
-  _AvlNode _current;
+  _AvlNode<E> _current;
 
   /// The version of the builder (when applicable) that is being iterated.
   int _iteratingBuilderVersion;
 
-  _AvlImmutableListIterator(_AvlNode root,
+  _AvlImmutableListIterator(_AvlNode<E> root,
       {_AvlImmutableListBuilder builder,
       int startIndex: -1,
       int count: -1,
@@ -369,7 +372,7 @@ class _AvlImmutableListIterator<E> implements Iterator<E> {
     _remainingCount = _count;
     _reversed = reversed;
     _iteratingBuilderVersion = builder != null ? builder.version : -1;
-    _stack = new Stack<_AvlNode>();
+    _stack = new Stack<_AvlNode<E>>();
     _resetStack();
   }
 
@@ -382,7 +385,7 @@ class _AvlImmutableListIterator<E> implements Iterator<E> {
 
     if (_stack != null) {
       if (_remainingCount > 0 && _stack.length > 0) {
-        _AvlNode n = _stack.pop();
+        _AvlNode<E> n = _stack.pop();
         _current = n;
         _pushNext(_nextBranch(n));
         _remainingCount--;
@@ -396,13 +399,13 @@ class _AvlImmutableListIterator<E> implements Iterator<E> {
 
   /// Obtains the right branch of the given node (or the left, if walking
   /// in reverse).
-  _AvlNode _nextBranch(_AvlNode node) => _reversed ? node.left : node.right;
+  _AvlNode<E> _nextBranch(_AvlNode<E> node) => _reversed ? node.left : node.right;
 
   /// Obtains the left branch of the given node (or the right, if walking
   /// in reverse).
-  _AvlNode _previousBranch(_AvlNode node) => _reversed ? node.right : node.left;
+  _AvlNode<E> _previousBranch(_AvlNode<E> node) => _reversed ? node.right : node.left;
 
-  void _pushNext(_AvlNode node) {
+  void _pushNext(_AvlNode<E> node) {
     checkNotNull(node);
 
     while (node.isNotEmpty) {
@@ -462,10 +465,10 @@ class _AvlNode<E> extends IterableBase<E>
   int _length;
 
   /// The left tree.
-  _AvlNode _left;
+  _AvlNode<E> _left;
 
   /// The right tree.
-  _AvlNode _right;
+  _AvlNode<E> _right;
 
   _AvlNode()
       : _height = 0,
@@ -491,13 +494,13 @@ class _AvlNode<E> extends IterableBase<E>
   Iterator<E> get iterator => new _AvlImmutableListIterator(this);
 
   @override
-  _AvlNode get left => _left;
+  _AvlNode<E> get left => _left;
 
   @override
   int get length => _length;
 
   @override
-  _AvlNode get right => _right;
+  _AvlNode<E> get right => _right;
 
   @override
   E get value => _key;
@@ -513,10 +516,10 @@ class _AvlNode<E> extends IterableBase<E>
   }
 
   /// Adds the specified key to the tree.
-  _AvlNode add(E key) => insert(_length, key);
+  _AvlNode<E> add(E key) => insert(_length, key);
 
   /// Adds the specified keys to the tree.
-  _AvlNode addAll(Iterable<E> keys) => insertAll(_length, keys);
+  _AvlNode<E> addAll(Iterable<E> keys) => insertAll(_length, keys);
 
   /// Freezes this node and all descendant nodes so that any mutations require
   /// a new instance of the nodes.
@@ -552,7 +555,7 @@ class _AvlNode<E> extends IterableBase<E>
   }
 
   /// Adds a value at a given index to this node.
-  _AvlNode insert(int index, E key) {
+  _AvlNode<E> insert(int index, E key) {
     if (index < 0 || index > _length) throw new RangeError('index');
 
     if (isEmpty) {
@@ -567,21 +570,22 @@ class _AvlNode<E> extends IterableBase<E>
         result = this._mutate(right: newRight);
       }
 
-      return _makeBalanced(result);
+      return _makeBalanced(result) as _AvlNode<E>;
     }
   }
 
   /// Adds a collection of values at a given index to this node.
-  _AvlNode insertAll(int index, Iterable<E> keys) {
+  _AvlNode<E> insertAll(int index, Iterable<E> keys) {
     RangeError.checkValueInInterval(index, 0, _length, "index");
     checkNotNull(keys);
 
     if (isEmpty) {
-      _AvlImmutableList<E> other = _tryCastToImmutableList(keys);
+      _AvlImmutableList<E> other =
+          _tryCastToImmutableList(keys) as _AvlImmutableList<E>;
       if (other != null) return other._root;
 
       final list = keys.toList();
-      return _AvlNode.nodeTreeFromList(list, 0, list.length);
+      return _AvlNode.nodeTreeFromList(list, 0, list.length) as _AvlNode<E>;
     } else {
       _AvlNode result;
       if (index <= _left._length) {
@@ -592,7 +596,7 @@ class _AvlNode<E> extends IterableBase<E>
         result = _mutate(right: newRight);
       }
 
-      return _balanceNode(result);
+      return _balanceNode(result) as _AvlNode<E>;
     }
   }
 
@@ -616,7 +620,7 @@ class _AvlNode<E> extends IterableBase<E>
   }
 
   /// Removes a value at a given index to this node.
-  _AvlNode removeAt(int index) {
+  _AvlNode<E> removeAt(int index) {
     RangeError.checkValidIndex(index, this);
 
     var result = this;
@@ -625,7 +629,7 @@ class _AvlNode<E> extends IterableBase<E>
       // by returning Empty.  If we have only one child,
       // replace the node with the child.
       if (_right.isEmpty && _left.isEmpty) {
-        result = emptyNode;
+        result = emptyNode as _AvlNode<E>;
       } else if (_right.isEmpty && !_left.isEmpty) {
         result = _left;
       } else if (!_right.isEmpty && _left.isEmpty) {
@@ -649,10 +653,10 @@ class _AvlNode<E> extends IterableBase<E>
       result = this._mutate(right: newRight);
     }
 
-    return result.isEmpty ? result : _makeBalanced(result);
+    return result.isEmpty ? result : _makeBalanced(result) as _AvlNode<E>;
   }
 
-  _AvlNode removeWhere(bool test(E element)) {
+  _AvlNode<E> removeWhere(bool test(E element)) {
     checkNotNull(test);
 
     var result = this;
@@ -668,7 +672,7 @@ class _AvlNode<E> extends IterableBase<E>
     return result;
   }
 
-  _AvlNode replaceAt(int index, E value) {
+  _AvlNode<E> replaceAt(int index, E value) {
     RangeError.checkValidIndex(index, this);
 
     var result = this;
@@ -687,11 +691,11 @@ class _AvlNode<E> extends IterableBase<E>
   }
 
   Iterator<E> _iterator(ImmutableListBuilder builder) =>
-      new _AvlImmutableListIterator(this, builder: builder);
+      new _AvlImmutableListIterator<E>(this, builder: builder);
 
   /// Creates a node mutation, either by mutating this node (if not yet frozen)
   /// or by creating a clone of this node with the described changes.
-  _AvlNode _mutate({_AvlNode left: null, _AvlNode right: null}) {
+  _AvlNode<E> _mutate({_AvlNode<E> left: null, _AvlNode<E> right: null}) {
     if (_frozen) {
       return new _AvlNode.from(_key, left ?? _left, right ?? _right);
     } else {
@@ -704,7 +708,7 @@ class _AvlNode<E> extends IterableBase<E>
     }
   }
 
-  _AvlNode _mutateValue(E value) {
+  _AvlNode<E> _mutateValue(E value) {
     if (_frozen) {
       return new _AvlNode.from(value, _left, _right);
     } else {
@@ -817,7 +821,7 @@ class _AvlNode<E> extends IterableBase<E>
 }
 
 class _ReversedIterable<E> extends IterableBase<E> {
-  final _AvlNode _root;
+  final _AvlNode<E> _root;
 
   _ReversedIterable(this._root);
 
@@ -827,7 +831,7 @@ class _ReversedIterable<E> extends IterableBase<E> {
 }
 
 class _SubListIterable<E> extends IterableBase<E> {
-  final _AvlNode _root;
+  final _AvlNode<E> _root;
   final int _start;
   final int _end;
 
@@ -848,7 +852,7 @@ class _AvlImmutableListBuilder<E> extends ListBase<E>
     implements ImmutableListBuilder<E> {
   /// The binary tree used to store the contents of the list.
   /// Contents are typically not entirely frozen.
-  _AvlNode _rootUnsafe = _AvlNode.emptyNode;
+  _AvlNode<E> _rootUnsafe = _AvlNode.emptyNode as _AvlNode<E>;
 
   /// Caches an immutable instance that represents the current state of
   /// the collection.
@@ -882,9 +886,9 @@ class _AvlImmutableListBuilder<E> extends ListBase<E>
   /// A number that increments every time the builder changes its contents.
   int get version => _version;
 
-  _AvlNode get _root => _rootUnsafe;
+  _AvlNode<E> get _root => _rootUnsafe;
 
-  void set _root(_AvlNode newRoot) {
+  void set _root(_AvlNode<E> newRoot) {
     _version++;
 
     if (_rootUnsafe != newRoot) {
@@ -917,11 +921,11 @@ class _AvlImmutableListBuilder<E> extends ListBase<E>
 
   @override
   void clear() {
-    _root = _AvlNode.emptyNode;
+    _root = _AvlNode.emptyNode as _AvlNode<E>;
   }
 
   @override
-  bool contains(Object element) => _root.indexOf(element) >= 0;
+  bool contains(Object element) => _root.indexOf(element as E) >= 0;
 
   @override
   Iterable<E> getRange(int start, int end) {
@@ -931,7 +935,7 @@ class _AvlImmutableListBuilder<E> extends ListBase<E>
 
   @override
   int indexOf(Object element, [int startIndex = 0]) =>
-      _root.indexOf(element, startIndex);
+      _root.indexOf(element as E, startIndex);
 
   @override
   void insert(int index, E element) {
@@ -949,7 +953,7 @@ class _AvlImmutableListBuilder<E> extends ListBase<E>
 
   @override
   int lastIndexOf(Object element, [int startIndex]) =>
-      _root.lastIndexOf(element, startIndex);
+      _root.lastIndexOf(element as E, startIndex);
 
   @override
   bool remove(Object element) {
@@ -1014,7 +1018,7 @@ class _AvlImmutableListBuilder<E> extends ListBase<E>
   @override
   ImmutableList<E> toImmutable() {
     if (_immutable == null) {
-      _immutable = _AvlImmutableList._wrapNode(_root);
+      _immutable = _AvlImmutableList._wrapNode(_root) as ImmutableList<E>;
     }
 
     return _immutable;

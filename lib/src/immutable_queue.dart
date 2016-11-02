@@ -46,7 +46,7 @@ class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
   /// Backing field for the [backwardsReversed] property.
   _ImmutableStack<E> _backwardsReversed;
 
-  factory _ImmutableQueue.empty() => _empty;
+  factory _ImmutableQueue.empty() => _empty as _ImmutableQueue<E>;
 
   _ImmutableQueue(_ImmutableStack<E> forwards, _ImmutableStack<E> backwards)
       : _forwards = forwards,
@@ -57,7 +57,7 @@ class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
   }
 
   /// Gets the empty queue.
-  ImmutableQueue<E> clear() => _empty;
+  ImmutableQueue<E> clear() => _empty as ImmutableQueue<E>;
 
   @override
   bool get isEmpty => _forwards.isEmpty && _backwards.isEmpty;
@@ -79,7 +79,8 @@ class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
   ImmutableQueue<E> enqueue(E value) {
     if (isEmpty) {
       return new _ImmutableQueue<E>(
-          _ImmutableStack._empty.push(value), _ImmutableStack._empty);
+          (_ImmutableStack._empty as _ImmutableStack<E>).push(value),
+          _ImmutableStack._empty as _ImmutableStack<E>);
     } else {
       return new _ImmutableQueue<E>(_forwards, _backwards.push(value));
     }
@@ -93,9 +94,10 @@ class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
     if (f.isNotEmpty) {
       return new _ImmutableQueue<E>(f, _backwards);
     } else if (_backwards.isEmpty) {
-      return _ImmutableQueue._empty;
+      return _ImmutableQueue._empty as ImmutableQueue<E>;
     } else {
-      return new _ImmutableQueue<E>(backwardsReversed, _ImmutableStack._empty);
+      return new _ImmutableQueue<E>(
+          backwardsReversed, _ImmutableStack._empty as _ImmutableStack<E>);
     }
   }
 

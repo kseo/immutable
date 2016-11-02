@@ -8,7 +8,7 @@ abstract class ImmutableStack<E> implements Iterable<E> {
   factory ImmutableStack.from(Iterable<E> items) {
     checkNotNull(items);
 
-    var stack = _ImmutableStack._empty;
+    var stack = _ImmutableStack._empty as _ImmutableStack<E>;
     for (final item in items) {
       stack = stack.push(item);
     }
@@ -39,7 +39,7 @@ class _ImmutableStack<E> extends IterableBase<E> implements ImmutableStack<E> {
   final E _head;
   final ImmutableStack<E> _tail;
 
-  factory _ImmutableStack.empty() => _empty;
+  factory _ImmutableStack.empty() => _empty as _ImmutableStack<E>;
 
   _ImmutableStack()
       : _head = null,
@@ -52,7 +52,7 @@ class _ImmutableStack<E> extends IterableBase<E> implements ImmutableStack<E> {
   }
 
   @override
-  _ImmutableStack<E> clear() => _empty;
+  _ImmutableStack<E> clear() => _empty as _ImmutableStack<E>;
 
   @override
   bool get isEmpty => _tail == null;
