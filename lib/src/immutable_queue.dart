@@ -35,20 +35,20 @@ abstract class ImmutableQueue<E> implements Iterable<E> {
 
 class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
   static final _ImmutableQueue _empty =
-      new _ImmutableQueue(_ImmutableStack._empty, _ImmutableStack._empty);
+      new _ImmutableQueue(ImmutableStack._empty, ImmutableStack._empty);
 
   /// The end of the queue that enqueued elements are pushed onto.
-  final _ImmutableStack<E> _backwards;
+  final ImmutableStack<E> _backwards;
 
   /// The end of the queue from which elements are dequeued.
-  final _ImmutableStack<E> _forwards;
+  final ImmutableStack<E> _forwards;
 
   /// Backing field for the [backwardsReversed] property.
-  _ImmutableStack<E> _backwardsReversed;
+  ImmutableStack<E> _backwardsReversed;
 
   factory _ImmutableQueue.empty() => _empty as _ImmutableQueue<E>;
 
-  _ImmutableQueue(_ImmutableStack<E> forwards, _ImmutableStack<E> backwards)
+  _ImmutableQueue(ImmutableStack<E> forwards, ImmutableStack<E> backwards)
       : _forwards = forwards,
         _backwards = backwards,
         _backwardsReversed = null {
@@ -62,7 +62,7 @@ class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
   @override
   bool get isEmpty => _forwards.isEmpty && _backwards.isEmpty;
 
-  _ImmutableStack<E> get backwardsReversed {
+  ImmutableStack<E> get backwardsReversed {
     if (_backwardsReversed == null) _backwardsReversed = _backwards._reverse();
 
     return _backwardsReversed;
@@ -79,8 +79,8 @@ class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
   ImmutableQueue<E> enqueue(E value) {
     if (isEmpty) {
       return new _ImmutableQueue<E>(
-          (_ImmutableStack._empty as _ImmutableStack<E>).push(value),
-          _ImmutableStack._empty as _ImmutableStack<E>);
+          (ImmutableStack._empty as ImmutableStack<E>).push(value),
+          ImmutableStack._empty as ImmutableStack<E>);
     } else {
       return new _ImmutableQueue<E>(_forwards, _backwards.push(value));
     }
@@ -90,14 +90,14 @@ class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
   ImmutableQueue<E> dequeue() {
     if (isEmpty) throw new StateError('queue empty');
 
-    _ImmutableStack<E> f = _forwards.pop();
+    ImmutableStack<E> f = _forwards.pop();
     if (f.isNotEmpty) {
       return new _ImmutableQueue<E>(f, _backwards);
     } else if (_backwards.isEmpty) {
       return _ImmutableQueue._empty as ImmutableQueue<E>;
     } else {
       return new _ImmutableQueue<E>(
-          backwardsReversed, _ImmutableStack._empty as _ImmutableStack<E>);
+          backwardsReversed, ImmutableStack._empty as ImmutableStack<E>);
     }
   }
 
@@ -109,11 +109,11 @@ class _ImmutableQueueIterator<E> implements Iterator<E> {
   final _ImmutableQueue<E> _originalQueue;
 
   /// The remaining forwards stack of the queue being enumerated.
-  _ImmutableStack<E> _remainingForwardsStack;
+  ImmutableStack<E> _remainingForwardsStack;
 
   /// The remaining backwards stack of the queue being enumerated.
   /// Its order is reversed when the field is first initialized.
-  _ImmutableStack<E> _remainingBackwardsStack;
+  ImmutableStack<E> _remainingBackwardsStack;
 
   _ImmutableQueueIterator(this._originalQueue);
 

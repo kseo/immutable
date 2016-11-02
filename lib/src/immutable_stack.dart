@@ -1,14 +1,21 @@
 part of immutable;
 
-abstract class ImmutableStack<E> implements Iterable<E> {
+class ImmutableStack<E> extends IterableBase<E> {
+  static final ImmutableStack _empty = new ImmutableStack._internal(null, null);
+
+  final E _head;
+  final ImmutableStack<E> _tail;
+
+  Iterator<E> get iterator => new _ImmutableStackIterator(this);
+
   /// Returns an empty collection.
-  factory ImmutableStack.empty() => new _ImmutableStack<E>.empty();
+  factory ImmutableStack.empty() => _empty as ImmutableStack<E>;
 
   ///  Creates a new immutable collection prefilled with the specified [items].
   factory ImmutableStack.from(Iterable<E> items) {
     checkNotNull(items);
 
-    var stack = _ImmutableStack._empty as _ImmutableStack<E>;
+    var stack = ImmutableStack._empty as ImmutableStack<E>;
     for (final item in items) {
       stack = stack.push(item);
     }
@@ -16,65 +23,36 @@ abstract class ImmutableStack<E> implements Iterable<E> {
     return stack;
   }
 
-  /// Gets an empty stack.
-  ImmutableStack<E> clear();
-
-  /// Pushes an element onto a stack and returns the new stack.
-  ImmutableStack<E> push(E value);
-
-  /// Pops the top element off the stack and returns the new stack.
-  ///
-  /// [StateError] is thrown when the stack is empty.
-  ImmutableStack<E> pop();
-
-  /// Gets the element on the top of the stack.
-  ///
-  /// [StateError] is thrown when the stack is empty.
-  E peek();
-}
-
-class _ImmutableStack<E> extends IterableBase<E> implements ImmutableStack<E> {
-  static final _ImmutableStack _empty = new _ImmutableStack();
-
-  final E _head;
-  final ImmutableStack<E> _tail;
-
-  factory _ImmutableStack.empty() => _empty as _ImmutableStack<E>;
-
-  _ImmutableStack()
-      : _head = null,
-        _tail = null;
-
-  _ImmutableStack.from(E head, _ImmutableStack<E> tail)
+  ImmutableStack._internal(E head, ImmutableStack<E> tail)
       : _head = head,
-        _tail = tail {
-    checkNotNull(tail);
-  }
-
-  @override
-  _ImmutableStack<E> clear() => _empty as _ImmutableStack<E>;
+        _tail = tail;
 
   @override
   bool get isEmpty => _tail == null;
 
-  @override
+  /// Pushes an element onto a stack and returns the new stack.
+  ImmutableStack<E> push(E value) => new ImmutableStack._internal(value, this);
+
+  /// Pops the top element off the stack and returns the new stack.
+  ///
+  /// [StateError] is thrown when the stack is empty.
+  ImmutableStack<E> pop() {
+    if (isEmpty) throw new StateError('stack is empty');
+
+    return _tail;
+  }
+
+  /// Gets the element on the top of the stack.
+  ///
+  /// [StateError] is thrown when the stack is empty.
   E peek() {
     if (isEmpty) throw new StateError('stack is empty');
 
     return _head;
   }
 
-  @override
-  _ImmutableStack<E> push(E value) => new _ImmutableStack.from(value, this);
-
-  @override
-  _ImmutableStack<E> pop() {
-    if (isEmpty) throw new StateError('stack is empty');
-
-    return _tail;
-  }
-
-  Iterator<E> get iterator => new _ImmutableStackIterator(this);
+  /// Gets an empty stack.
+  ImmutableStack<E> clear() => _empty as ImmutableStack<E>;
 
   /// Reverses the order of a stack.
   ImmutableStack<E> _reverse() {
@@ -90,12 +68,12 @@ class _ImmutableStack<E> extends IterableBase<E> implements ImmutableStack<E> {
 /// Enumerates a stack with no memory allocations.
 class _ImmutableStackIterator<E> implements Iterator<E> {
   /// The original stack being enumerated.
-  final _ImmutableStack<E> _originalStack;
+  final ImmutableStack<E> _originalStack;
 
   /// The remaining stack not yet enumerated.
-  _ImmutableStack<E> _remainingStack;
+  ImmutableStack<E> _remainingStack;
 
-  _ImmutableStackIterator(_ImmutableStack<E> stack) : _originalStack = stack {
+  _ImmutableStackIterator(ImmutableStack<E> stack) : _originalStack = stack {
     checkNotNull(stack);
   }
 
