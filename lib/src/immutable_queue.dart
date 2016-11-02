@@ -1,8 +1,12 @@
-part of immutable;
+import 'dart:collection';
+
+import 'package:quiver_check/check.dart';
+
+import 'immutable_stack.dart';
 
 class ImmutableQueue<E> extends IterableBase<E> {
   static final ImmutableQueue _empty = new ImmutableQueue._internal(
-      ImmutableStack._empty, ImmutableStack._empty);
+      new ImmutableStack.empty(), new ImmutableStack.empty());
 
   /// The end of the queue that enqueued elements are pushed onto.
   final ImmutableStack<E> _backwards;
@@ -14,7 +18,8 @@ class ImmutableQueue<E> extends IterableBase<E> {
   ImmutableStack<E> _backwardsReversed;
 
   ImmutableStack<E> get backwardsReversed {
-    if (_backwardsReversed == null) _backwardsReversed = _backwards._reverse();
+    if (_backwardsReversed == null)
+      _backwardsReversed = _reverseStack(_backwards) as ImmutableStack<E>;
 
     return _backwardsReversed;
   }
@@ -64,8 +69,8 @@ class ImmutableQueue<E> extends IterableBase<E> {
   ImmutableQueue<E> enqueue(E value) {
     if (isEmpty) {
       return new ImmutableQueue<E>._internal(
-          (ImmutableStack._empty as ImmutableStack<E>).push(value),
-          ImmutableStack._empty as ImmutableStack<E>);
+          (new ImmutableStack<E>.empty()).push(value),
+          new ImmutableStack<E>.empty());
     } else {
       return new ImmutableQueue<E>._internal(_forwards, _backwards.push(value));
     }
@@ -84,7 +89,7 @@ class ImmutableQueue<E> extends IterableBase<E> {
       return ImmutableQueue._empty as ImmutableQueue<E>;
     } else {
       return new ImmutableQueue<E>._internal(
-          backwardsReversed, ImmutableStack._empty as ImmutableStack<E>);
+          backwardsReversed, new ImmutableStack<E>.empty());
     }
   }
 }
@@ -131,4 +136,14 @@ class _ImmutableQueueIterator<E> implements Iterator<E> {
     return _remainingForwardsStack.isNotEmpty ||
         _remainingBackwardsStack.isNotEmpty;
   }
+}
+
+/// Reverses the order of a stack.
+ImmutableStack _reverseStack(ImmutableStack stack) {
+  var r = new ImmutableStack.empty();
+  for (ImmutableStack f = stack; f.isNotEmpty; f = f.pop()) {
+    r = r.push(f.peek());
+  }
+
+  return r;
 }

@@ -1,4 +1,4 @@
-part of immutable;
+import 'avl_immutable_list.dart';
 
 /// A list of elements that can only be modified by creating a new
 /// instance of the list.
@@ -9,13 +9,13 @@ part of immutable;
 /// data that is no longer being referenced.
 abstract class ImmutableList<E> implements Iterable<E> {
   /// An empty [ImmutableList].
-  factory ImmutableList.empty() => new _AvlImmutableList<E>.empty();
+  factory ImmutableList.empty() => new AvlImmutableList<E>.empty();
 
   /// Creates a list containing all [elements].
   ///
   /// The [Iterator] of [elements] provides the order of the elements.
   factory ImmutableList.from(Iterable<E> elements) =>
-      new _AvlImmutableList<E>.empty().addAll(elements);
+      new AvlImmutableList<E>.empty().addAll(elements);
 
   /// Returns an [Iterable] of the objects in this list in reverse order.
   Iterable<E> get reversed;
@@ -238,7 +238,7 @@ abstract class ImmutableList<E> implements Iterable<E> {
 abstract class ImmutableListBuilder<E> implements List<E> {
   /// Creates a new immutable list builder.
   factory ImmutableListBuilder.empty() =>
-      new _AvlImmutableList<E>.empty().toBuilder();
+      new AvlImmutableList<E>.empty().toBuilder();
 
   /// Creates a [ImmutableList] based on the contents of this instance.
   ImmutableList<E> toImmutable();

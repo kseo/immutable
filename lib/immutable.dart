@@ -5,15 +5,6 @@
 /// The immutable library.
 library immutable;
 
-import 'dart:collection';
-import 'dart:math';
-
-import 'package:quiver_check/check.dart';
-
-import 'src/internal.dart';
-
-part 'src/avl_immutable_list.dart';
-part 'src/immutable_list.dart';
-part 'src/immutable_queue.dart';
-part 'src/immutable_stack.dart';
-part 'src/key_value_pair.dart';
+export 'src/immutable_list.dart';
+export 'src/immutable_queue.dart';
+export 'src/immutable_stack.dart';

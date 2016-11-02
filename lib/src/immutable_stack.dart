@@ -1,4 +1,6 @@
-part of immutable;
+import 'dart:collection';
+
+import 'package:quiver_check/check.dart';
 
 class ImmutableStack<E> extends IterableBase<E> {
   static final ImmutableStack _empty = new ImmutableStack._internal(null, null);
@@ -53,16 +55,6 @@ class ImmutableStack<E> extends IterableBase<E> {
 
   /// Gets an empty stack.
   ImmutableStack<E> clear() => _empty as ImmutableStack<E>;
-
-  /// Reverses the order of a stack.
-  ImmutableStack<E> _reverse() {
-    var r = clear();
-    for (ImmutableStack<E> f = this; f.isNotEmpty; f = f.pop()) {
-      r = r.push(f.peek());
-    }
-
-    return r;
-  }
 }
 
 /// Enumerates a stack with no memory allocations.

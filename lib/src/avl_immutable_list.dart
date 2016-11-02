@@ -1,9 +1,15 @@
-part of immutable;
+import 'dart:collection';
+import 'dart:math';
+
+import 'package:quiver_check/check.dart';
+
+import 'immutable_list.dart';
+import 'internal.dart';
 
 /// Attempts to discover an [ImmutableList] instance beneath
 /// some iterable sequence if one exists.
-_AvlImmutableList _tryCastToImmutableList(Iterable sequence) {
-  if (sequence is _AvlImmutableList) {
+AvlImmutableList _tryCastToImmutableList(Iterable sequence) {
+  if (sequence is AvlImmutableList) {
     return sequence;
   }
 
@@ -14,18 +20,18 @@ _AvlImmutableList _tryCastToImmutableList(Iterable sequence) {
   return null;
 }
 
-class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
+class AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
   /// An empty immutable list.
-  static final _AvlImmutableList _empty = new _AvlImmutableList();
+  static final AvlImmutableList _empty = new AvlImmutableList();
 
   /// The root node of the AVL tree that stores this set.
   final _AvlNode<E> _root;
 
-  _AvlImmutableList() : _root = _AvlNode.emptyNode as _AvlNode<E>;
+  AvlImmutableList() : _root = _AvlNode.emptyNode as _AvlNode<E>;
 
-  factory _AvlImmutableList.empty() => _empty as _AvlImmutableList<E>;
+  factory AvlImmutableList.empty() => _empty as AvlImmutableList<E>;
 
-  _AvlImmutableList.fromNode(this._root) {
+  AvlImmutableList.fromNode(this._root) {
     checkNotNull(_root);
 
     _root.freeze();
@@ -280,8 +286,8 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
 
     // If the items being added actually come from an ImmutableList<E>
     // then there is no value in reconstructing it.
-    _AvlImmutableList<E> other =
-        _tryCastToImmutableList(iterable) as _AvlImmutableList<E>;
+    AvlImmutableList<E> other =
+        _tryCastToImmutableList(iterable) as AvlImmutableList<E>;
     if (other != null) return other;
 
     // Rather than build up the immutable structure in the incremental way,
@@ -296,14 +302,14 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
 
     _AvlNode<E> root =
         _AvlNode.nodeTreeFromList(list, 0, list.length) as _AvlNode<E>;
-    return new _AvlImmutableList<E>.fromNode(root);
+    return new AvlImmutableList<E>.fromNode(root);
   }
 
   ImmutableList<E> _wrap(_AvlNode<E> root) {
     if (root != _root) {
       return root.isEmpty
           ? this.clear()
-          : new _AvlImmutableList<E>.fromNode(root);
+          : new AvlImmutableList<E>.fromNode(root);
     } else {
       return this;
     }
@@ -311,8 +317,8 @@ class _AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
 
   static ImmutableList _wrapNode(_AvlNode root) {
     return root.isEmpty
-        ? _AvlImmutableList._empty
-        : new _AvlImmutableList.fromNode(root);
+        ? AvlImmutableList._empty
+        : new AvlImmutableList.fromNode(root);
   }
 }
 
@@ -580,8 +586,8 @@ class _AvlNode<E> extends IterableBase<E>
     checkNotNull(keys);
 
     if (isEmpty) {
-      _AvlImmutableList<E> other =
-          _tryCastToImmutableList(keys) as _AvlImmutableList<E>;
+      AvlImmutableList<E> other =
+          _tryCastToImmutableList(keys) as AvlImmutableList<E>;
       if (other != null) return other._root;
 
       final list = keys.toList();
@@ -862,7 +868,7 @@ class _AvlImmutableListBuilder<E> extends ListBase<E>
 
   int _version = 0;
 
-  _AvlImmutableListBuilder(_AvlImmutableList<E> list) {
+  _AvlImmutableListBuilder(AvlImmutableList<E> list) {
     checkNotNull(list);
     _root = list._root;
     _immutable = list;
@@ -1018,7 +1024,7 @@ class _AvlImmutableListBuilder<E> extends ListBase<E>
   @override
   ImmutableList<E> toImmutable() {
     if (_immutable == null) {
-      _immutable = _AvlImmutableList._wrapNode(_root) as ImmutableList<E>;
+      _immutable = AvlImmutableList._wrapNode(_root) as ImmutableList<E>;
     }
 
     return _immutable;
