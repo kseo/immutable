@@ -1,3 +1,7 @@
+// Copyright (c) 2015, Kwang Yul Seo <kwangyul.seo@gmail.com>.
+// All rights reserved. Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 import 'avl_immutable_list.dart';
 
 /// A list of elements that can only be modified by creating a new
