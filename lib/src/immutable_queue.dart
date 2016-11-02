@@ -1,41 +1,8 @@
 part of immutable;
 
-abstract class ImmutableQueue<E> implements Iterable<E> {
-  /// Returns an empty collection.
-  factory ImmutableQueue.empty() => new _ImmutableQueue<E>.empty();
-
-  ///  Creates a new immutable collection prefilled with the specified [items].
-  factory ImmutableQueue.from(Iterable<E> items) {
-    checkNotNull(items);
-
-    var queue = new _ImmutableQueue<E>.empty();
-    for (final item in items) {
-      queue = queue.enqueue(item);
-    }
-
-    return queue;
-  }
-
-  /// Gets an empty queue.
-  ImmutableQueue<E> clear();
-
-  /// Gets the element at the front of the queue.
-  ///
-  /// [StateError] is thrown when the queue is empty.
-  E peek();
-
-  /// Adds an element to the back of the queue and returns a new queue.
-  ImmutableQueue<E> enqueue(E value);
-
-  /// Returns a queue that is missing the front element.
-  ///
-  /// [StateError] is thrown when the queue is empty.
-  ImmutableQueue<E> dequeue();
-}
-
-class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
-  static final _ImmutableQueue _empty =
-      new _ImmutableQueue(ImmutableStack._empty, ImmutableStack._empty);
+class ImmutableQueue<E> extends IterableBase<E> {
+  static final ImmutableQueue _empty = new ImmutableQueue._internal(
+      ImmutableStack._empty, ImmutableStack._empty);
 
   /// The end of the queue that enqueued elements are pushed onto.
   final ImmutableStack<E> _backwards;
@@ -46,9 +13,34 @@ class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
   /// Backing field for the [backwardsReversed] property.
   ImmutableStack<E> _backwardsReversed;
 
-  factory _ImmutableQueue.empty() => _empty as _ImmutableQueue<E>;
+  ImmutableStack<E> get backwardsReversed {
+    if (_backwardsReversed == null) _backwardsReversed = _backwards._reverse();
 
-  _ImmutableQueue(ImmutableStack<E> forwards, ImmutableStack<E> backwards)
+    return _backwardsReversed;
+  }
+
+  Iterator<E> get iterator => new _ImmutableQueueIterator(this);
+
+  @override
+  bool get isEmpty => _forwards.isEmpty && _backwards.isEmpty;
+
+  /// Returns an empty collection.
+  factory ImmutableQueue.empty() => _empty as ImmutableQueue<E>;
+
+  ///  Creates a new immutable collection prefilled with the specified [items].
+  factory ImmutableQueue.from(Iterable<E> items) {
+    checkNotNull(items);
+
+    var queue = new ImmutableQueue<E>.empty();
+    for (final item in items) {
+      queue = queue.enqueue(item);
+    }
+
+    return queue;
+  }
+
+  ImmutableQueue._internal(
+      ImmutableStack<E> forwards, ImmutableStack<E> backwards)
       : _forwards = forwards,
         _backwards = backwards,
         _backwardsReversed = null {
@@ -59,54 +51,47 @@ class _ImmutableQueue<E> extends IterableBase<E> implements ImmutableQueue<E> {
   /// Gets the empty queue.
   ImmutableQueue<E> clear() => _empty as ImmutableQueue<E>;
 
-  @override
-  bool get isEmpty => _forwards.isEmpty && _backwards.isEmpty;
-
-  ImmutableStack<E> get backwardsReversed {
-    if (_backwardsReversed == null) _backwardsReversed = _backwards._reverse();
-
-    return _backwardsReversed;
-  }
-
-  @override
+  /// Gets the element at the front of the queue.
+  ///
+  /// [StateError] is thrown when the queue is empty.
   E peek() {
     if (isEmpty) throw new StateError('queue empty');
 
     return _forwards.peek();
   }
 
-  @override
+  /// Adds an element to the back of the queue and returns a new queue.
   ImmutableQueue<E> enqueue(E value) {
     if (isEmpty) {
-      return new _ImmutableQueue<E>(
+      return new ImmutableQueue<E>._internal(
           (ImmutableStack._empty as ImmutableStack<E>).push(value),
           ImmutableStack._empty as ImmutableStack<E>);
     } else {
-      return new _ImmutableQueue<E>(_forwards, _backwards.push(value));
+      return new ImmutableQueue<E>._internal(_forwards, _backwards.push(value));
     }
   }
 
-  @override
+  /// Returns a queue that is missing the front element.
+  ///
+  /// [StateError] is thrown when the queue is empty.
   ImmutableQueue<E> dequeue() {
     if (isEmpty) throw new StateError('queue empty');
 
     ImmutableStack<E> f = _forwards.pop();
     if (f.isNotEmpty) {
-      return new _ImmutableQueue<E>(f, _backwards);
+      return new ImmutableQueue<E>._internal(f, _backwards);
     } else if (_backwards.isEmpty) {
-      return _ImmutableQueue._empty as ImmutableQueue<E>;
+      return ImmutableQueue._empty as ImmutableQueue<E>;
     } else {
-      return new _ImmutableQueue<E>(
+      return new ImmutableQueue<E>._internal(
           backwardsReversed, ImmutableStack._empty as ImmutableStack<E>);
     }
   }
-
-  Iterator<E> get iterator => new _ImmutableQueueIterator(this);
 }
 
 class _ImmutableQueueIterator<E> implements Iterator<E> {
   /// The original queue being enumerated.
-  final _ImmutableQueue<E> _originalQueue;
+  final ImmutableQueue<E> _originalQueue;
 
   /// The remaining forwards stack of the queue being enumerated.
   ImmutableStack<E> _remainingForwardsStack;
