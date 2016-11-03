@@ -6,5 +6,6 @@
 library immutable;
 
 export 'src/immutable_list.dart';
+export 'src/immutable_map.dart';
 export 'src/immutable_queue.dart';
 export 'src/immutable_stack.dart';

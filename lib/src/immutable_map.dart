@@ -2,6 +2,8 @@
 // All rights reserved. Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+import 'hamt_immutable_map.dart';
+
 abstract class ImmutableMap<K, V> {
   /// Gets the number of elements in the map.
   int get length;
@@ -19,9 +21,7 @@ abstract class ImmutableMap<K, V> {
   Iterable<V> get values;
 
   /// Creates an ImmutableMap instance with the default implementation.
-  factory ImmutableMap.empty() {
-    throw new UnimplementedError();
-  }
+  factory ImmutableMap.empty() => new HamtImmutableMap<K, V>.empty();
 
   /// Creates an ImmutableMap instance in which the keys and values are computed
   /// from the [iterable].

@@ -6,6 +6,14 @@ library immutable.example;
 import 'package:immutable/immutable.dart';
 
 main() {
-  var awesome = new Awesome();
-  print('awesome: ${awesome.isAwesome}');
+  var m = new ImmutableMap<int, String>.empty();
+  m = m.add(1, 'a').add(2, 'b').add(3, 'c');
+  print('m[1]: ${m[1]}');
+  print('m[2]: ${m[2]}');
+  print('m[3]: ${m[3]}');
+  print('m[4]: ${m[4]}');
+  m = m.remove(1).remove(2);
+  print('m[1]: ${m[1]}');
+  print('m[2]: ${m[2]}');
+  print('m[3]: ${m[3]}');
 }
