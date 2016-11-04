@@ -16,6 +16,12 @@ main() {
   print('m.keys: ${m.keys}');
   print('m.values: ${m.values}');
 
+  print('--- forEach ---');
+  m.forEach((int key, String value) {
+    print('key $key, value $value');
+  });
+  print('---------------');
+
   m = m.remove(1).remove(2);
   print('m[1]: ${m[1]}');
   print('m[2]: ${m[2]}');

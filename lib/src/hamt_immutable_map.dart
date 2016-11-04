@@ -82,7 +82,12 @@ class HamtImmutableMap<K, V> implements ImmutableMap<K, V> {
 
   @override
   void forEach(void f(K key, V value)) {
-    throw new UnimplementedError();
+    if (_hasNull) f(null, _nullValue);
+    if (_root == null) return;
+    final entries = _root.iter((k, v) => new _MapEntry(k, v));
+    entries.forEach((_MapEntry<K, V> entry) {
+      f(entry.key, entry.value);
+    });
   }
 
   @override
@@ -482,4 +487,10 @@ Iterable _iterNode(List list, SelectorFunction f) sync* {
       yield* (nodeOrValue as Node).iter(f);
     }
   }
+}
+
+class _MapEntry<K, V> {
+  final K key;
+  final V value;
+  _MapEntry(this.key, this.value);
 }
