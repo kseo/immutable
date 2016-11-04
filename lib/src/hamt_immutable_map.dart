@@ -124,58 +124,125 @@ class HamtImmutableMap<K, V> implements ImmutableMap<K, V> {
   }
 
   @override
-  ImmutableMapBuilder<K, V> toBuilder() {
-    throw new UnimplementedError();
-  }
+  ImmutableMapBuilder<K, V> toBuilder() => new HamtImmutableMapBuilder(this);
 }
 
 class HamtImmutableMapBuilder<K, V> extends MapBase<K, V>
     implements ImmutableMapBuilder<K, V> {
-  @override
-  Iterable<K> get keys {
-    throw new UnimplementedError();
-  }
+  Node<K, V> _root;
+  bool _hasNull;
+  V _nullValue;
+  int _length;
+  final Box _leafFlag = new Box(null);
 
-  ImmutableMap<K, V> toImmutable() {
-    throw new UnimplementedError();
+  @override
+  int get length => _length;
+
+  @override
+  bool get isEmpty => _length == 0;
+
+  @override
+  bool get isNotEmpty => _length != 0;
+
+  HamtImmutableMapBuilder(HamtImmutableMap<K, V> m)
+      : _root = m._root,
+        _hasNull = m._hasNull,
+        _nullValue = m._nullValue,
+        _length = m.length;
+
+  @override
+  Iterable<K> get keys sync* {
+    if (_hasNull) yield null;
+    if (_root == null) return;
+    yield* _root.iter((key, _) => key) as Iterable<K>;
   }
 
   V operator [](Object key) {
-    throw new UnimplementedError();
+    if (key == null) {
+      if (_hasNull)
+        return _nullValue;
+      else
+        return null;
+    }
+    if (_root == null) return null;
+
+    Object notFound = null;
+    return _root.find(0, key.hashCode, key as K, notFound as V);
   }
 
   void operator []=(K key, V value) {
-    throw new UnimplementedError();
+    if (key == null) {
+      if (_nullValue != value) _nullValue = value;
+      if (!_hasNull) {
+        _length++;
+        _hasNull = true;
+      }
+    }
+    _leafFlag.value = null;
+    Node<K, V> n = (_root == null ? new BitmapIndexedNode<K, V>.empty() : _root)
+        .addM(0, key.hashCode, key, value, _leafFlag);
+    if (n != _root) _root = n;
+    if (_leafFlag.value != null) _length--;
   }
 
   @override
   void clear() {
-    throw new UnimplementedError();
+    _root = new BitmapIndexedNode<K, V>.empty();
+    _hasNull = false;
+    _nullValue = null;
+    _length = 0;
   }
 
   @override
   V remove(Object key) {
-    throw new UnimplementedError();
+    if (key == null) {
+      if (_hasNull) return null;
+      V value = _nullValue;
+      _hasNull = false;
+      _nullValue = null;
+      _length--;
+      return value;
+    }
+    if (_root == null) return null;
+    _leafFlag.value = null;
+    Node<K, V> n = _root.removeM(0, key.hashCode, key as K, _leafFlag);
+    if (n != _root) _root = n;
+    if (_leafFlag.value != null) _length--;
+    return _leafFlag.value as V;
   }
+
+  ImmutableMap<K, V> toImmutable() =>
+      new HamtImmutableMap._internal(_length, _root, _hasNull, _nullValue);
 }
 
 typedef SelectorFunction(key, value);
 
 abstract class Node<K, V> {
-  factory Node(int shift, K key1, V value1, int key2hash, K key2, V value2) {
+  factory Node(int shift, K key1, V value1, int key2hash, K key2, V value2,
+      {bool edit = false}) {
     int key1hash = key1.hashCode;
     if (key1hash == key2hash)
       return new HashCollisionNode<K, V>(
           key1hash, 2, [key1, value1, key2, value2]);
     Box addedLeaf = new Box(null);
-    return new BitmapIndexedNode<K, V>.empty()
-        .add(shift, key1hash, key1, value1, addedLeaf)
-        .add(shift, key2hash, key2, value2, addedLeaf);
+    if (edit) {
+      return new BitmapIndexedNode<K, V>.empty()
+          .addM(shift, key1hash, key1, value1, addedLeaf)
+          .addM(shift, key2hash, key2, value2, addedLeaf);
+    } else {
+      return new BitmapIndexedNode<K, V>.empty()
+          .add(shift, key1hash, key1, value1, addedLeaf)
+          .add(shift, key2hash, key2, value2, addedLeaf);
+    }
   }
 
   Node<K, V> add(int shift, int hash, K key, V value, Box addedLeaf);
 
+  Node<K, V> addM(int shift, int hash, K key, V value, Box addedLeaf);
+
   Node<K, V> remove(int shift, int hash, K key);
+
+  Node<K, V> removeM(int shift, int hash, K key, Box removedLeaf);
 
   V find(int shift, int hash, K key, V notFound);
 
@@ -185,14 +252,16 @@ abstract class Node<K, V> {
 class BitmapIndexedNode<K, V> implements Node<K, V> {
   static BitmapIndexedNode _empty = new BitmapIndexedNode(0, []);
 
-  final int bitmap;
+  int bitmap;
 
   final List<Object> list;
+
+  final bool edit;
 
   factory BitmapIndexedNode.empty() =>
       BitmapIndexedNode._empty as BitmapIndexedNode<K, V>;
 
-  BitmapIndexedNode(this.bitmap, this.list);
+  BitmapIndexedNode(this.bitmap, this.list, {this.edit = false});
 
   @override
   Iterable iter(SelectorFunction f) => _iterNode(list, f);
@@ -256,6 +325,55 @@ class BitmapIndexedNode<K, V> implements Node<K, V> {
   }
 
   @override
+  Node<K, V> addM(int shift, int hash, K key, V value, Box addedLeaf) {
+    int bit = bitPos(hash, shift);
+    int idx = _index(bit);
+    if ((bitmap & bit) != 0) {
+      final keyOrNull = list[2 * idx];
+      final valueOrNode = list[2 * idx + 1];
+      if (keyOrNull == null) {
+        Node<K, V> n = (valueOrNode as Node<K, V>)
+            .addM(shift + 5, hash, key, value, addedLeaf);
+        if (n == valueOrNode) return this;
+        return _editAndSet(2 * idx + 1, n);
+      }
+      if (key == keyOrNull) {
+        if (value == valueOrNode) return this;
+        return _editAndSet(2 * idx + 1, value);
+      }
+      addedLeaf.value = addedLeaf;
+      return _editAndSet2(2 * idx, null, 2 * idx + 1,
+          new Node(shift + 5, keyOrNull, valueOrNode, hash, key, value));
+    } else {
+      int n = _bitCount(bitmap);
+      if (n >= 16) {
+        final nodes = new List<Node<K, V>>(32);
+        int jdx = mask(hash, shift);
+        nodes[jdx] = new BitmapIndexedNode<K, V>.empty()
+            .addM(shift + 5, hash, key, value, addedLeaf);
+        int j = 0;
+        for (int i = 0; i < 32; i++) {
+          if (((bitmap >> i) & 1) != 0) {
+            if (list[j] == null)
+              nodes[i] = list[j + 1] as Node<K, V>;
+            else
+              nodes[i] = new BitmapIndexedNode<K, V>.empty().addM(shift + 5,
+                  list[j].hashCode, list[j] as K, list[j + 1] as V, addedLeaf);
+          }
+          j += 2;
+        }
+        return new ListNode<K, V>(n + 1, nodes, edit: edit);
+      } else {
+        addedLeaf.value = addedLeaf;
+        BitmapIndexedNode<K, V> editable = _ensureEditable();
+        editable.list.insertAll(2 * idx, [key, value]);
+        editable.bitmap |= bit;
+        return editable;
+      }
+    }
+  }
+
+  @override
   Node<K, V> remove(int shift, int hash, K key) {
     int bit = bitPos(hash, shift);
     if ((bitmap & bit) == 0) return this;
@@ -279,6 +397,29 @@ class BitmapIndexedNode<K, V> implements Node<K, V> {
   }
 
   @override
+  Node<K, V> removeM(int shift, int hash, K key, Box removedLeaf) {
+    int bit = bitPos(hash, shift);
+    if ((bitmap & bit) == 0) return this;
+    int idx = _index(bit);
+    final keyOrNull = list[2 * idx];
+    final valueOrNode = list[2 * idx + 1];
+    if (keyOrNull == null) {
+      Node<K, V> n = (valueOrNode as Node<K, V>)
+          .removeM(shift + 5, hash, key, removedLeaf);
+      if (n == valueOrNode) return this;
+      if (n != null) return _editAndSet(2 * idx + 1, n);
+      if (bitmap == bit) return null;
+      return _editAndRemovePair(bit, idx);
+    }
+    if (key == keyOrNull) {
+      removedLeaf.value = valueOrNode;
+      // TODO: collapse
+      return _editAndRemovePair(bit, idx);
+    }
+    return this;
+  }
+
+  @override
   V find(int shift, int hash, K key, V notFound) {
     int bit = bitPos(hash, shift);
     if ((bitmap & bit) == 0) return notFound;
@@ -290,13 +431,42 @@ class BitmapIndexedNode<K, V> implements Node<K, V> {
     if (key == keyOrNull) return valueOrNode as V;
     return notFound;
   }
+
+  BitmapIndexedNode<K, V> _ensureEditable() {
+    if (edit) return this;
+    List<Node<K, V>> newList = new List.from(list);
+    return new BitmapIndexedNode(bitmap, newList, edit: edit);
+  }
+
+  BitmapIndexedNode<K, V> _editAndSet(int i, Object a) {
+    BitmapIndexedNode<K, V> editable = _ensureEditable();
+    editable.list[i] = a;
+    return editable;
+  }
+
+  BitmapIndexedNode<K, V> _editAndSet2(int i, Object a, int j, Object b) {
+    BitmapIndexedNode<K, V> editable = _ensureEditable();
+    editable
+      ..list[i] = a
+      ..list[j] = b;
+    return editable;
+  }
+
+  BitmapIndexedNode<K, V> _editAndRemovePair(int bit, int i) {
+    if (bitmap == bit) return null;
+    BitmapIndexedNode<K, V> editable = _ensureEditable();
+    editable.bitmap ^= bit;
+    editable.list..removeRange(i, i + 2);
+    return editable;
+  }
 }
 
 class ListNode<K, V> implements Node<K, V> {
-  final int count;
+  final bool edit;
+  int count;
   final List<Node<K, V>> list;
 
-  ListNode(this.count, this.list);
+  ListNode(this.count, this.list, {this.edit = false});
 
   @override
   Iterable iter(SelectorFunction f) sync* {
@@ -325,6 +495,23 @@ class ListNode<K, V> implements Node<K, V> {
   }
 
   @override
+  Node<K, V> addM(int shift, int hash, K key, V value, Box addedLeaf) {
+    int idx = mask(hash, shift);
+    Node<K, V> node = list[idx];
+    if (node == null) {
+      ListNode<K, V> editable = _editAndSet(
+          idx,
+          new BitmapIndexedNode<K, V>.empty()
+              .addM(shift + 5, hash, key, value, addedLeaf));
+      editable.count++;
+      return editable;
+    }
+    Node<K, V> n = node.addM(shift + 5, hash, key, value, addedLeaf);
+    if (n == node) return this;
+    return _editAndSet(idx, n);
+  }
+
+  @override
   Node<K, V> remove(int shift, int hash, K key) {
     int idx = mask(hash, shift);
     Node<K, V> node = list[idx];
@@ -333,13 +520,29 @@ class ListNode<K, V> implements Node<K, V> {
     if (n == node) return this;
     if (n == null) {
       if (count <= 8) // shrink
-        return pack(idx);
+        return pack(false, idx);
       return new ListNode<K, V>(
           count - 1, cloneAndSet(list, idx, n) as List<Node<K, V>>);
     } else {
       return new ListNode<K, V>(
           count, cloneAndSet(list, idx, n) as List<Node<K, V>>);
     }
+  }
+
+  @override
+  Node<K, V> removeM(int shift, int hash, K key, Box removedLeaf) {
+    int idx = mask(hash, shift);
+    Node<K, V> node = list[idx];
+    if (node == null) return this;
+    Node<K, V> n = node.removeM(shift + 5, hash, key, removedLeaf);
+    if (n == node) return this;
+    if (n == null) {
+      if (count <= 8) return pack(true, idx);
+      ListNode<K, V> editable = _editAndSet(idx, n);
+      editable.count--;
+      return editable;
+    }
+    return _editAndSet(idx, n);
   }
 
   @override
@@ -350,7 +553,7 @@ class ListNode<K, V> implements Node<K, V> {
     return node.find(shift + 5, hash, key, notFound);
   }
 
-  Node<K, V> pack(int idx) {
+  Node<K, V> pack(bool edit, int idx) {
     List<Node<K, V>> newList = new List<Node<K, V>>(2 * (count - 1));
     int j = 1;
     int bitmap = 0;
@@ -366,16 +569,28 @@ class ListNode<K, V> implements Node<K, V> {
         bitmap |= 1 << i;
         j += 2;
       }
-    return new BitmapIndexedNode(bitmap, newList);
+    return new BitmapIndexedNode(bitmap, newList, edit: edit);
+  }
+
+  ListNode<K, V> _editAndSet(int i, Node<K, V> n) {
+    ListNode<K, V> editable = _ensureEditable();
+    editable.list[i] = n;
+    return editable;
+  }
+
+  ListNode<K, V> _ensureEditable() {
+    if (edit) return this;
+    return new ListNode<K, V>(count, new List.from(list), edit: true);
   }
 }
 
 class HashCollisionNode<K, V> implements Node<K, V> {
   final int hash;
-  final int count;
+  int count;
   final List list;
+  final bool edit;
 
-  HashCollisionNode(this.hash, this.count, this.list);
+  HashCollisionNode(this.hash, this.count, this.list, {this.edit = false});
 
   @override
   Iterable iter(SelectorFunction f) => _iterNode(list, f);
@@ -401,12 +616,44 @@ class HashCollisionNode<K, V> implements Node<K, V> {
   }
 
   @override
+  Node<K, V> addM(int shift, int hash, K key, V value, Box addedLeaf) {
+    if (hash == this.hash) {
+      int idx = findIndex(key);
+      if (idx != -1) {
+        if (list[idx + 1] == value) return this;
+        return _editAndSet(idx + 1, value);
+      }
+      HashCollisionNode<K, V> editable = _ensureEditable();
+      editable.list.addAll([key, value]);
+      editable.count++;
+      addedLeaf.value = addedLeaf;
+      return editable;
+    }
+    // nest it in a bitmap node
+    return new BitmapIndexedNode<K, V>(bitPos(this.hash, shift), [null, this],
+            edit: edit)
+        .addM(shift, hash, key, value, addedLeaf);
+  }
+
+  @override
   Node<K, V> remove(int shift, int hash, K key) {
     int idx = findIndex(key);
     if (idx == -1) return this;
     if (count == 1) return null;
     return new HashCollisionNode<K, V>(
         hash, count - 1, removePair(list, idx ~/ 2));
+  }
+
+  @override
+  Node<K, V> removeM(int shift, int hash, K key, Box removedLeaf) {
+    int idx = findIndex(key);
+    if (idx == -1) return this;
+    removedLeaf.value = list[idx + 1];
+    if (count == 1) return null;
+    HashCollisionNode<K, V> editable = _ensureEditable();
+    editable.list.removeRange(idx, idx + 2);
+    editable.count--;
+    return editable;
   }
 
   @override
@@ -423,6 +670,26 @@ class HashCollisionNode<K, V> implements Node<K, V> {
       if (key == list[i]) return i;
     }
     return -1;
+  }
+
+  HashCollisionNode<K, V> _ensureEditable() {
+    if (edit) return this;
+    final newList = new List.from(list);
+    return new HashCollisionNode<K, V>(hash, count, newList, edit: edit);
+  }
+
+  HashCollisionNode<K, V> _editAndSet(int i, Object a) {
+    HashCollisionNode<K, V> editable = _ensureEditable();
+    editable.list[i] = a;
+    return editable;
+  }
+
+  HashCollisionNode<K, V> _editAndSet2(int i, Object a, int j, Object b) {
+    HashCollisionNode<K, V> editable = _ensureEditable();
+    editable
+      ..list[i] = a
+      ..list[j] = b;
+    return editable;
   }
 }
 
