@@ -12,8 +12,15 @@ main() {
   print('m[2]: ${m[2]}');
   print('m[3]: ${m[3]}');
   print('m[4]: ${m[4]}');
+  print('m.length: ${m.length}');
+  print('m.keys: ${m.keys}');
+  print('m.values: ${m.values}');
+
   m = m.remove(1).remove(2);
   print('m[1]: ${m[1]}');
   print('m[2]: ${m[2]}');
   print('m[3]: ${m[3]}');
+  print('m.length: ${m.length}');
+  print('m.keys: ${m.keys}');
+  print('m.values: ${m.values}');
 }

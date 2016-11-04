@@ -28,13 +28,17 @@ class HamtImmutableMap<K, V> implements ImmutableMap<K, V> {
   bool get isNotEmpty => length != 0;
 
   @override
-  Iterable<K> get keys {
-    throw new UnimplementedError();
+  Iterable<K> get keys sync* {
+    if (_hasNull) yield null;
+    if (_root == null) return;
+    yield* _root.iter((key, _) => key) as Iterable<K>;
   }
 
   @override
-  Iterable<V> get values {
-    throw new UnimplementedError();
+  Iterable<V> get values sync* {
+    if (_hasNull) yield _nullValue;
+    if (_root == null) return;
+    yield* _root.iter((_, value) => value) as Iterable<V>;
   }
 
   factory HamtImmutableMap.empty() => _empty as HamtImmutableMap<K, V>;
@@ -155,6 +159,8 @@ class HamtImmutableMapBuilder<K, V> extends MapBase<K, V>
   }
 }
 
+typedef SelectorFunction(key, value);
+
 abstract class Node<K, V> {
   factory Node(int shift, K key1, V value1, int key2hash, K key2, V value2) {
     int key1hash = key1.hashCode;
@@ -172,6 +178,8 @@ abstract class Node<K, V> {
   Node<K, V> remove(int shift, int hash, K key);
 
   V find(int shift, int hash, K key, V notFound);
+
+  Iterable iter(SelectorFunction f);
 }
 
 class BitmapIndexedNode<K, V> implements Node<K, V> {
@@ -185,6 +193,9 @@ class BitmapIndexedNode<K, V> implements Node<K, V> {
       BitmapIndexedNode._empty as BitmapIndexedNode<K, V>;
 
   BitmapIndexedNode(this.bitmap, this.list);
+
+  @override
+  Iterable iter(SelectorFunction f) => _iterNode(list, f);
 
   int _index(int bit) => _bitCount(bitmap & (bit - 1));
 
@@ -288,6 +299,13 @@ class ListNode<K, V> implements Node<K, V> {
   ListNode(this.count, this.list);
 
   @override
+  Iterable iter(SelectorFunction f) sync* {
+    for (final node in list) {
+      if (node != null) yield* node.iter(f);
+    }
+  }
+
+  @override
   Node<K, V> add(int shift, int hash, K key, V value, Box addedLeaf) {
     int idx = mask(hash, shift);
     Node<K, V> node = list[idx];
@@ -358,6 +376,9 @@ class HashCollisionNode<K, V> implements Node<K, V> {
   final List list;
 
   HashCollisionNode(this.hash, this.count, this.list);
+
+  @override
+  Iterable iter(SelectorFunction f) => _iterNode(list, f);
 
   @override
   Node<K, V> add(int shift, int hash, K key, V value, Box addedLeaf) {
@@ -448,4 +469,17 @@ int _bitCount(int i) {
   i += (i >> 8);
   i += (i >> 16);
   return (i & 0x0000003F);
+}
+
+@override
+Iterable _iterNode(List list, SelectorFunction f) sync* {
+  for (int i = 0; i < list.length; i += 2) {
+    final key = list[i];
+    final nodeOrValue = list[i + 1];
+    if (key != null) {
+      yield f(key, nodeOrValue);
+    } else if (nodeOrValue != null) {
+      yield* (nodeOrValue as Node).iter(f);
+    }
+  }
 }
