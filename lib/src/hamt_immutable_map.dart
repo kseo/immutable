@@ -73,9 +73,7 @@ class HamtImmutableMap<K, V> implements ImmutableMap<K, V> {
   }
 
   @override
-  bool containsValue(Object value) {
-    throw new UnimplementedError();
-  }
+  bool containsValue(Object value) => values.contains(value);
 
   @override
   void forEach(void f(K key, V value)) {
