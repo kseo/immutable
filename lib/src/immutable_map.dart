@@ -88,9 +88,6 @@ abstract class ImmutableMap<K, V> {
   // according to the `==` operator.
   bool containsValue(Object value);
 
-  /// Gets the empty instance.
-  ImmutableMap<K, V> clear();
-
   /// Applies [f] to each key-value pair of the map.
   ///
   /// Calling `f` must not add or remove keys from the map.

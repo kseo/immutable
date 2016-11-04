@@ -78,9 +78,6 @@ class HamtImmutableMap<K, V> implements ImmutableMap<K, V> {
   }
 
   @override
-  ImmutableMap<K, V> clear() => new HamtImmutableMap<K, V>.empty();
-
-  @override
   void forEach(void f(K key, V value)) {
     if (_hasNull) f(null, _nullValue);
     if (_root == null) return;

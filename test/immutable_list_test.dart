@@ -9,7 +9,6 @@ void main() {
     test('empty test', () {
       final empty = new ImmutableList<int>.empty();
       expect(new ImmutableList<int>.empty(), same(empty));
-      expect(empty.clear(), same(empty));
       expect(empty.isEmpty, isTrue);
       expect(empty.length, equals(0));
       expect(empty.indexOf(null), -1);

@@ -91,9 +91,6 @@ class AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
   }
 
   @override
-  ImmutableList<E> clear() => _empty as ImmutableList<E>;
-
-  @override
   bool contains(Object element) => indexOf(element as E) >= 0;
 
   @override
@@ -312,7 +309,7 @@ class AvlImmutableList<E> extends IterableBase<E> implements ImmutableList<E> {
   ImmutableList<E> _wrap(_AvlNode<E> root) {
     if (root != _root) {
       return root.isEmpty
-          ? this.clear()
+          ? new AvlImmutableList<E>.empty()
           : new AvlImmutableList<E>.fromNode(root);
     } else {
       return this;

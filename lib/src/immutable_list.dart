@@ -35,9 +35,6 @@ abstract class ImmutableList<E> implements Iterable<E> {
   /// this list.
   ImmutableList<E> addAll(Iterable<E> iterable);
 
-  /// Gets an empty list.
-  ImmutableList<E> clear();
-
   /// Sets the objects in the range [start] inclusive to [end] exclusive to
   /// the given [fillValue].
   ///
