@@ -67,8 +67,9 @@ class HamtImmutableMap<K, V> implements ImmutableMap<K, V> {
   @override
   bool containsKey(Object key) {
     if (key == null) return _hasNull;
-    return (_root != null)
-        ? _root.find(0, key.hashCode, key as K, _notFound as V) != _notFound
+    return _root != null
+        ? !identical(
+            _root.find(0, key.hashCode, key as K, _notFound as V), _notFound)
         : false;
   }
 
@@ -88,7 +89,7 @@ class HamtImmutableMap<K, V> implements ImmutableMap<K, V> {
   @override
   ImmutableMap<K, V> add(K key, V value) {
     if (key == null) {
-      if (_hasNull && value == _nullValue) return this;
+      if (_hasNull && identical(value, _nullValue)) return this;
       return new HamtImmutableMap._internal(
           _hasNull ? length : length + 1, _root, true, value);
     }
@@ -96,7 +97,7 @@ class HamtImmutableMap<K, V> implements ImmutableMap<K, V> {
     Node<K, V> newRoot =
         (_root == null ? new BitmapIndexedNode<K, V>.empty() : _root)
             .add(0, key.hashCode, key, value, addedLeaf);
-    if (newRoot == _root) return this;
+    if (identical(newRoot, _root)) return this;
     return new HamtImmutableMap._internal(
         addedLeaf.value == null ? length : length + 1,
         newRoot,
@@ -118,7 +119,7 @@ class HamtImmutableMap<K, V> implements ImmutableMap<K, V> {
     }
     if (_root == null) return this;
     Node<K, V> newRoot = _root.remove(0, key.hashCode, key as K);
-    if (newRoot == _root) return this;
+    if (identical(newRoot, _root)) return this;
     return new HamtImmutableMap._internal(
         length - 1, newRoot, _hasNull, _nullValue);
   }
@@ -181,7 +182,7 @@ class HamtImmutableMapBuilder<K, V> extends MapBase<K, V>
     _leafFlag.value = null;
     Node<K, V> n = (_root == null ? new BitmapIndexedNode<K, V>.empty() : _root)
         .addM(0, key.hashCode, key, value, _leafFlag);
-    if (n != _root) _root = n;
+    if (!identical(n, _root)) _root = n;
     if (_leafFlag.value != null) _length--;
   }
 
@@ -206,7 +207,7 @@ class HamtImmutableMapBuilder<K, V> extends MapBase<K, V>
     if (_root == null) return null;
     _leafFlag.value = null;
     Node<K, V> n = _root.removeM(0, key.hashCode, key as K, _leafFlag);
-    if (n != _root) _root = n;
+    if (!identical(n, _root)) _root = n;
     if (_leafFlag.value != null) _length--;
     return _leafFlag.value as V;
   }
@@ -278,12 +279,12 @@ class BitmapIndexedNode<K, V> implements Node<K, V> {
       if (keyOrNull == null) {
         Node n = (valueOrNode as Node<K, V>)
             .add(shift + 5, hash, key, value, addedLeaf);
-        if (n == valueOrNode) return this;
+        if (identical(n, valueOrNode)) return this;
         return new BitmapIndexedNode(
             bitmap, cloneAndSet(list, 2 * idx + 1, n) as List<Node<K, V>>);
       }
       if (key == keyOrNull) {
-        if (value == valueOrNode) return this;
+        if (identical(value, valueOrNode)) return this;
         return new BitmapIndexedNode(
             bitmap, cloneAndSet(list, 2 * idx + 1, value) as List<Node<K, V>>);
       }
@@ -334,11 +335,11 @@ class BitmapIndexedNode<K, V> implements Node<K, V> {
       if (keyOrNull == null) {
         Node<K, V> n = (valueOrNode as Node<K, V>)
             .addM(shift + 5, hash, key, value, addedLeaf);
-        if (n == valueOrNode) return this;
+        if (identical(n, valueOrNode)) return this;
         return _editAndSet(2 * idx + 1, n);
       }
       if (key == keyOrNull) {
-        if (value == valueOrNode) return this;
+        if (identical(value, valueOrNode)) return this;
         return _editAndSet(2 * idx + 1, value);
       }
       addedLeaf.value = addedLeaf;
@@ -382,7 +383,7 @@ class BitmapIndexedNode<K, V> implements Node<K, V> {
     final valueOrNode = list[2 * idx + 1];
     if (keyOrNull == null) {
       Node n = (valueOrNode as Node<K, V>).remove(shift + 5, hash, key);
-      if (n == valueOrNode) return this;
+      if (identical(n, valueOrNode)) return this;
       if (n != null)
         return new BitmapIndexedNode<K, V>(
             bitmap, cloneAndSet(list, 2 * idx + 1, n) as List<Node<K, V>>);
@@ -406,7 +407,7 @@ class BitmapIndexedNode<K, V> implements Node<K, V> {
     if (keyOrNull == null) {
       Node<K, V> n = (valueOrNode as Node<K, V>)
           .removeM(shift + 5, hash, key, removedLeaf);
-      if (n == valueOrNode) return this;
+      if (identical(n, valueOrNode)) return this;
       if (n != null) return _editAndSet(2 * idx + 1, n);
       if (bitmap == bit) return null;
       return _editAndRemovePair(bit, idx);
@@ -489,7 +490,7 @@ class ListNode<K, V> implements Node<K, V> {
                   shift + 5, hash, key, value, addedLeaf)) as List<Node<K, V>>);
     }
     Node<K, V> n = node.add(shift + 5, hash, key, value, addedLeaf);
-    if (n == node) return this;
+    if (identical(n, node)) return this;
     return new ListNode<K, V>(
         count, cloneAndSet(list, idx, n) as List<Node<K, V>>);
   }
