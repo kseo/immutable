@@ -810,7 +810,6 @@ int _bitCount(int i) {
   return (i & 0x0000003F);
 }
 
-@override
 Iterable _iterNode(List list, SelectorFunction f) sync* {
   for (int i = 0; i < list.length; i += 2) {
     final key = list[i];
