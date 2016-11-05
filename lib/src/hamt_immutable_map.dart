@@ -241,8 +241,8 @@ class HamtImmutableMapBuilder<K, V> extends MapBase<K, V>
     return _leafFlag.value as V;
   }
 
-  ImmutableMap<K, V> toImmutable() =>
-      new HamtImmutableMap._internal(_length, _root, _hasNull, _nullValue);
+  ImmutableMap<K, V> toImmutable() => new HamtImmutableMap._internal(
+      _length, _root?.freeze(), _hasNull, _nullValue);
 }
 
 typedef SelectorFunction(key, value);
@@ -265,6 +265,8 @@ abstract class Node<K, V> {
           .add(shift, key2hash, key2, value2, addedLeaf);
     }
   }
+
+  Node<K, V> freeze();
 
   Node<K, V> add(int shift, int hash, K key, V value, Box addedLeaf);
 
@@ -297,6 +299,22 @@ class BitmapIndexedNode<K, V> implements Node<K, V> {
   Iterable iter(SelectorFunction f) => _iterNode(list, f);
 
   int _index(int bit) => _bitCount(bitmap & (bit - 1));
+
+  @override
+  Node<K, V> freeze() {
+    final newList = new List()..length = list.length;
+    for (int i = 0; i < list.length; i += 2) {
+      final key = list[i];
+      final nodeOrValue = list[i + 1];
+      if (key != null) {
+        newList[i] = list[i];
+        newList[i + 1] = list[i + 1];
+      } else if (nodeOrValue != null) {
+        newList[i + 1] = (nodeOrValue as Node).freeze();
+      }
+    }
+    return new BitmapIndexedNode(bitmap, newList);
+  }
 
   @override
   Node<K, V> add(int shift, int hash, K key, V value, Box addedLeaf) {
@@ -506,6 +524,16 @@ class ListNode<K, V> implements Node<K, V> {
   }
 
   @override
+  Node<K, V> freeze() {
+    final newList = new List<Node<K, V>>()..length = list.length;
+    for (int i = 0; i < list.length; i++) {
+      final node = list[i];
+      if (node != null) newList[i] = node.freeze();
+    }
+    return new ListNode(count, newList);
+  }
+
+  @override
   Node<K, V> add(int shift, int hash, K key, V value, Box addedLeaf) {
     int idx = mask(hash, shift);
     Node<K, V> node = list[idx];
@@ -624,6 +652,22 @@ class HashCollisionNode<K, V> implements Node<K, V> {
 
   @override
   Iterable iter(SelectorFunction f) => _iterNode(list, f);
+
+  @override
+  Node<K, V> freeze() {
+    final newList = new List()..length = list.length;
+    for (int i = 0; i < list.length; i += 2) {
+      final key = list[i];
+      final nodeOrValue = list[i + 1];
+      if (key != null) {
+        newList[i] = list[i];
+        newList[i + 1] = list[i + 1];
+      } else if (nodeOrValue != null) {
+        newList[i + 1] = (nodeOrValue as Node).freeze();
+      }
+    }
+    return new HashCollisionNode(hash, count, newList);
+  }
 
   @override
   Node<K, V> add(int shift, int hash, K key, V value, Box addedLeaf) {
