@@ -302,6 +302,8 @@ class BitmapIndexedNode<K, V> implements Node<K, V> {
 
   @override
   Node<K, V> freeze() {
+    if (!edit) return this;
+
     final newList = new List()..length = list.length;
     for (int i = 0; i < list.length; i += 2) {
       final key = list[i];
@@ -390,8 +392,12 @@ class BitmapIndexedNode<K, V> implements Node<K, V> {
         return _editAndSet(2 * idx + 1, value);
       }
       addedLeaf.value = addedLeaf;
-      return _editAndSet2(2 * idx, null, 2 * idx + 1,
-          new Node(shift + 5, keyOrNull, valueOrNode, hash, key, value));
+      return _editAndSet2(
+          2 * idx,
+          null,
+          2 * idx + 1,
+          new Node(shift + 5, keyOrNull, valueOrNode, hash, key, value,
+              edit: true));
     } else {
       int n = _bitCount(bitmap);
       if (n >= 16) {
@@ -410,7 +416,7 @@ class BitmapIndexedNode<K, V> implements Node<K, V> {
             j += 2;
           }
         }
-        return new ListNode<K, V>(n + 1, nodes, edit: edit);
+        return new ListNode<K, V>(n + 1, nodes, edit: true);
       } else {
         addedLeaf.value = addedLeaf;
         BitmapIndexedNode<K, V> editable = _ensureEditable();
@@ -483,7 +489,7 @@ class BitmapIndexedNode<K, V> implements Node<K, V> {
   BitmapIndexedNode<K, V> _ensureEditable() {
     if (edit) return this;
     List<Node<K, V>> newList = new List.from(list);
-    return new BitmapIndexedNode(bitmap, newList, edit: edit);
+    return new BitmapIndexedNode(bitmap, newList, edit: true);
   }
 
   BitmapIndexedNode<K, V> _editAndSet(int i, Object a) {
@@ -525,6 +531,8 @@ class ListNode<K, V> implements Node<K, V> {
 
   @override
   Node<K, V> freeze() {
+    if (!edit) return this;
+
     final newList = new List<Node<K, V>>()..length = list.length;
     for (int i = 0; i < list.length; i++) {
       final node = list[i];
@@ -655,6 +663,8 @@ class HashCollisionNode<K, V> implements Node<K, V> {
 
   @override
   Node<K, V> freeze() {
+    if (!edit) return this;
+
     final newList = new List()..length = list.length;
     for (int i = 0; i < list.length; i += 2) {
       final key = list[i];
@@ -703,7 +713,7 @@ class HashCollisionNode<K, V> implements Node<K, V> {
     }
     // nest it in a bitmap node
     return new BitmapIndexedNode<K, V>(bitPos(this.hash, shift), [null, this],
-            edit: edit)
+            edit: true)
         .addM(shift, hash, key, value, addedLeaf);
   }
 
@@ -747,7 +757,7 @@ class HashCollisionNode<K, V> implements Node<K, V> {
   HashCollisionNode<K, V> _ensureEditable() {
     if (edit) return this;
     final newList = new List.from(list);
-    return new HashCollisionNode<K, V>(hash, count, newList, edit: edit);
+    return new HashCollisionNode<K, V>(hash, count, newList, edit: true);
   }
 
   HashCollisionNode<K, V> _editAndSet(int i, Object a) {
