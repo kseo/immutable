@@ -212,7 +212,7 @@ class HamtImmutableMapBuilder<K, V> extends MapBase<K, V>
     Node<K, V> n = (_root == null ? new BitmapIndexedNode<K, V>.empty() : _root)
         .addM(0, key.hashCode, key, value, _leafFlag);
     if (!identical(n, _root)) _root = n;
-    if (_leafFlag.value != null) _length--;
+    if (_leafFlag.value != null) _length++;
   }
 
   @override
