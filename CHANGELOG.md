@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.4
+
+* Add `ImmutableMap` and `ImmutableMapBuilder` class.
+* Remove `clear` method from `ImmutableList`. Use the `empty` constuctor
+  instead.
+* Remove `ImmutableListBuilder.empty` constructor. Call `toImmutable` on an
+  empty `ImmutableList` instead.
+* Turn on strong mode and fix warnings and errors.
+
 ## 0.0.3
 
 * Add `ImmutableList` and `ImmutableListBuilder` class.

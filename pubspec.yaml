@@ -1,6 +1,6 @@
 name: immutable
 description: Immutable collections for Dart
-version: 0.0.3
+version: 0.0.4
 author: Kwang Yul Seo <kwangyul.seo@gmail.com>
 homepage: https://github.com/kseo/immutable
 
