@@ -634,9 +634,7 @@ class HashCollisionNode<K, V> implements Node<K, V> {
         return new HashCollisionNode(
             hash, count, cloneAndSet(list, idx + 1, value));
       }
-      List newList = new List.from(list);
-      newList[2 * count] = key;
-      newList[2 * count + 1] = value;
+      List newList = new List.from(list)..addAll([key, value]);
       addedLeaf.value = addedLeaf;
       return new HashCollisionNode<K, V>(hash, count + 1, newList);
     }
