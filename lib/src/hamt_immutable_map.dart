@@ -786,7 +786,8 @@ List cloneAndSet2(List list, int i, Object a, int j, Object b) =>
       ..[i] = a
       ..[j] = b;
 
-List removePair(List list, int i) => new List.from(list)..removeRange(i, i + 2);
+List removePair(List list, int i) =>
+    new List.from(list)..removeRange(i * 2, i * 2 + 2);
 
 class Box {
   Object value;
@@ -837,3 +838,5 @@ class _MapEntry<K, V> {
   final V value;
   _MapEntry(this.key, this.value);
 }
+
+
