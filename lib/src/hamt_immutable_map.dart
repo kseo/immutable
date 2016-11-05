@@ -12,6 +12,24 @@ class HamtImmutableMap<K, V> implements ImmutableMap<K, V> {
 
   static final Object _notFound = new Object();
 
+  static void _fillMapWithIterables(Map map, Iterable keys, Iterable values) {
+    Iterator keyIterator = keys.iterator;
+    Iterator valueIterator = values.iterator;
+
+    bool hasNextKey = keyIterator.moveNext();
+    bool hasNextValue = valueIterator.moveNext();
+
+    while (hasNextKey && hasNextValue) {
+      map[keyIterator.current] = valueIterator.current;
+      hasNextKey = keyIterator.moveNext();
+      hasNextValue = valueIterator.moveNext();
+    }
+
+    if (hasNextKey || hasNextValue) {
+      throw new ArgumentError("Iterables do not have same length.");
+    }
+  }
+
   @override
   final int length;
 
@@ -45,11 +63,20 @@ class HamtImmutableMap<K, V> implements ImmutableMap<K, V> {
 
   factory HamtImmutableMap.fromIterable(Iterable iterable,
       {K key(element), V value(element)}) {
-    throw new UnimplementedError();
+    key ??= (K k) => k;
+    value ??= (V v) => v;
+
+    final builder = (_empty as HamtImmutableMap<K, V>).toBuilder();
+    for (final element in iterable) {
+      builder[key(element)] = value(element);
+    }
+    return builder.toImmutable();
   }
 
   factory HamtImmutableMap.fromIterables(Iterable<K> keys, Iterable<V> values) {
-    throw new UnimplementedError();
+    final builder = (_empty as HamtImmutableMap<K, V>).toBuilder();
+    _fillMapWithIterables(builder, keys, values);
+    return builder.toImmutable();
   }
 
   HamtImmutableMap._internal(
@@ -107,7 +134,9 @@ class HamtImmutableMap<K, V> implements ImmutableMap<K, V> {
 
   @override
   ImmutableMap<K, V> addAll(ImmutableMap<K, V> other) {
-    throw new UnimplementedError();
+    final builder = toBuilder();
+    builder.addAll(other.toBuilder());
+    return builder.toImmutable();
   }
 
   @override

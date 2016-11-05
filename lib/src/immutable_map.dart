@@ -54,9 +54,8 @@ abstract class ImmutableMap<K, V> {
   /// The keys computed by the source [iterable] do not need to be unique. The
   /// last occurrence of a key will simply overwrite any previous value.
   factory ImmutableMap.fromIterable(Iterable iterable,
-      {K key(element), V value(element)}) {
-    throw new UnimplementedError();
-  }
+          {K key(element), V value(element)}) =>
+      new HamtImmutableMap.fromIterable(iterable, key: key, value: value);
 
   /// Creates an ImmutableMap instance associating the given [keys] to [values].
   ///
@@ -72,9 +71,8 @@ abstract class ImmutableMap<K, V> {
   /// overwrites the previous value.
   ///
   /// The two [Iterable]s must have the same length.
-  factory ImmutableMap.fromIterables(Iterable<K> keys, Iterable<V> values) {
-    throw new UnimplementedError();
-  }
+  factory ImmutableMap.fromIterables(Iterable<K> keys, Iterable<V> values) =>
+      new HamtImmutableMap.fromIterables(keys, values);
 
   /// Returns `true` if this map contains the given [key].
   ///
