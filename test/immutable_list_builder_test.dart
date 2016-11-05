@@ -6,11 +6,6 @@ import 'package:test/test.dart';
 
 void main() {
   group('ImmutableListBuilderTest', () {
-    test('create builder', () {
-      final builder = new ImmutableListBuilder<String>.empty();
-      expect(builder, isNotNull);
-    });
-
     test('toBuilder', () {
       final builder = new ImmutableList<int>.empty().toBuilder();
       builder.add(3);

@@ -237,10 +237,6 @@ abstract class ImmutableList<E> implements Iterable<E> {
 /// A list that mutates with little or no memory allocations,
 /// can produce and/or build on immutable list instances very efficiently.
 abstract class ImmutableListBuilder<E> implements List<E> {
-  /// Creates a new immutable list builder.
-  factory ImmutableListBuilder.empty() =>
-      new AvlImmutableList<E>.empty().toBuilder();
-
   /// Creates a [ImmutableList] based on the contents of this instance.
   ImmutableList<E> toImmutable();
 }
