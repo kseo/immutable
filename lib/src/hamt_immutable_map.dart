@@ -389,8 +389,8 @@ class BitmapIndexedNode<K, V> implements Node<K, V> {
             else
               nodes[i] = new BitmapIndexedNode<K, V>.empty().addM(shift + 5,
                   list[j].hashCode, list[j] as K, list[j + 1] as V, addedLeaf);
+            j += 2;
           }
-          j += 2;
         }
         return new ListNode<K, V>(n + 1, nodes, edit: edit);
       } else {
