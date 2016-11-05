@@ -584,7 +584,7 @@ class ListNode<K, V> implements Node<K, V> {
   }
 
   Node<K, V> pack(bool edit, int idx) {
-    List<Node<K, V>> newList = new List<Node<K, V>>(2 * (count - 1));
+    List<Node<K, V>> newList = new List<Node<K, V>>()..length = 2 * (count - 1);
     int j = 1;
     int bitmap = 0;
     for (int i = 0; i < idx; i++)
